@@ -108,15 +108,16 @@ export interface ProfileDisplaySettings {
 
 export interface Profile {
   id: string;                    // Unique profile ID
-  personal: PersonalInfo;        // Name, email, phone, etc.
   socialLinks: SocialLink[];     // Array of social links
   displaySettings: ProfileDisplaySettings;
   
-  // Separate content for Web2 and Web3
+  // Separate content AND personal info for Web2 and Web3
   web2: {
+    personal: PersonalInfo;      // ✅ Web2 has its own personal info
     sections: ProfileSection[];  // Web2 content sections
   };
   web3: {
+    personal: PersonalInfo;      // ✅ Web3 has its own personal info
     sections: ProfileSection[];  // Web3 content sections
   };
   

@@ -4,11 +4,19 @@ import { useProfile } from '@/contexts/ProfileContext';
 import { Upload } from 'lucide-react';
 
 export function PersonalInfoEditor() {
-  const { profile, updatePersonalInfo } = useProfile();
+  const { profile, currentMode, updatePersonalInfo } = useProfile();
+  
+  // Get personal info for current mode
+  const personal = profile[currentMode].personal;
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Personal Information</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Personal Information</h2>
+        <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded">
+          {currentMode === 'web2' ? '👔 Web2 (Real You)' : '🎭 Web3 (Persona)'}
+        </span>
+      </div>
 
       {/* Profile Image */}
       <div>
@@ -16,9 +24,9 @@ export function PersonalInfoEditor() {
           Profile Photo
         </label>
         <div className="flex items-center gap-4">
-          {profile.personal.image ? (
+          {personal.image ? (
             <img
-              src={profile.personal.image}
+              src={personal.image}
               alt="Profile"
               className="w-20 h-20 rounded-lg object-cover"
             />
@@ -30,13 +38,16 @@ export function PersonalInfoEditor() {
           <div className="flex-1">
             <input
               type="text"
-              value={profile.personal.image}
-              onChange={(e) => updatePersonalInfo({ image: e.target.value })}
+              value={personal.image}
+              onChange={(e) => updatePersonalInfo(currentMode, { image: e.target.value })}
               placeholder="Paste image URL"
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Paste a direct image URL (e.g., from Imgur, your website)
+              {currentMode === 'web2' 
+                ? 'Your real photo (for professional profile)'
+                : 'Your avatar/PFP (anime, NFT, character art)'
+              }
             </p>
           </div>
         </div>
@@ -45,13 +56,13 @@ export function PersonalInfoEditor() {
       {/* Name */}
       <div>
         <label className="block text-sm font-medium mb-2">
-          Full Name *
+          {currentMode === 'web2' ? 'Full Name *' : 'Display Name / Pseudonym *'}
         </label>
         <input
           type="text"
-          value={profile.personal.name}
-          onChange={(e) => updatePersonalInfo({ name: e.target.value })}
-          placeholder="John Doe"
+          value={personal.name}
+          onChange={(e) => updatePersonalInfo(currentMode, { name: e.target.value })}
+          placeholder={currentMode === 'web2' ? 'John Doe' : 'CryptoNinja.eth'}
           className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -63,9 +74,9 @@ export function PersonalInfoEditor() {
         </label>
         <input
           type="text"
-          value={profile.personal.title}
-          onChange={(e) => updatePersonalInfo({ title: e.target.value })}
-          placeholder="Frontend Developer"
+          value={personal.title}
+          onChange={(e) => updatePersonalInfo(currentMode, { title: e.target.value })}
+          placeholder={currentMode === 'web2' ? 'Frontend Developer' : 'Community Ambassador'}
           className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -77,9 +88,9 @@ export function PersonalInfoEditor() {
         </label>
         <input
           type="email"
-          value={profile.personal.email}
-          onChange={(e) => updatePersonalInfo({ email: e.target.value })}
-          placeholder="john@example.com"
+          value={personal.email}
+          onChange={(e) => updatePersonalInfo(currentMode, { email: e.target.value })}
+          placeholder="your@example.com"
           className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -87,12 +98,12 @@ export function PersonalInfoEditor() {
       {/* Phone */}
       <div>
         <label className="block text-sm font-medium mb-2">
-          Contact Number *
+          Contact Number {currentMode === 'web3' && '(Optional)'}
         </label>
         <input
           type="tel"
-          value={profile.personal.phone}
-          onChange={(e) => updatePersonalInfo({ phone: e.target.value })}
+          value={personal.phone}
+          onChange={(e) => updatePersonalInfo(currentMode, { phone: e.target.value })}
           placeholder="+63 XXX-XXX-XXXX"
           className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
@@ -103,8 +114,8 @@ export function PersonalInfoEditor() {
         <input
           type="checkbox"
           id="image3D"
-          checked={profile.personal.imageIs3D}
-          onChange={(e) => updatePersonalInfo({ imageIs3D: e.target.checked })}
+          checked={personal.imageIs3D}
+          onChange={(e) => updatePersonalInfo(currentMode, { imageIs3D: e.target.checked })}
           className="w-4 h-4"
         />
         <label htmlFor="image3D" className="text-sm">

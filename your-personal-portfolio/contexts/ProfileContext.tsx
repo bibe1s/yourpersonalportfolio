@@ -29,7 +29,7 @@ interface ProfileContextType {
   setCurrentMode: (mode: ProfileMode) => void;
   
   // Personal Info
-  updatePersonalInfo: (updates: Partial<PersonalInfo>) => void;
+updatePersonalInfo: (mode: ProfileMode, updates: Partial<PersonalInfo>) => void;
   
   // Social Links
   addSocialLink: (link: Omit<SocialLink, 'id' | 'order'>) => void;
@@ -43,6 +43,7 @@ interface ProfileContextType {
   addSection: (mode: ProfileMode, section: Omit<ProfileSection, 'id' | 'order'>) => void;
   updateSection: (mode: ProfileMode, sectionId: string, updates: Partial<ProfileSection>) => void;
   deleteSection: (mode: ProfileMode, sectionId: string) => void;
+  reorderSections: (mode: ProfileMode, sectionIds: string[]) => void; 
   
   // Content Blocks
   addContentBlock: (mode: ProfileMode, sectionId: string, block: Omit<ContentBlock, 'id' | 'order'>) => void;
@@ -64,6 +65,8 @@ interface ProfileContextType {
   // Export/Import
   exportProfile: () => string;
   importProfile: (jsonString: string) => void;
+
+
 }
 
 // ============================================
@@ -110,15 +113,18 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   // PERSONAL INFO
   // ============================================
   
-  const updatePersonalInfo = (updates: Partial<PersonalInfo>) => {
-    setProfile(prev => ({
-      ...prev,
+const updatePersonalInfo = (mode: ProfileMode, updates: Partial<PersonalInfo>) => {
+  setProfile(prev => ({
+    ...prev,
+    [mode]: {
+      ...prev[mode],
       personal: {
-        ...prev.personal,
+        ...prev[mode].personal,
         ...updates,
       },
-    }));
-  };
+    },
+  }));
+};
   
   // ============================================
   // SOCIAL LINKS
@@ -191,57 +197,125 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     });
   };
   
-  const updateSection = (mode: ProfileMode, sectionId: string, updates: Partial<ProfileSection>) => {
-    setProfile(prev => ({
-      ...prev,
-      [mode]: {
-        sections: prev[mode].sections.map(section =>
-          section.id === sectionId ? { ...section, ...updates } : section
-        ),
-      },
-    }));
-  };
+const updateSection = (mode: ProfileMode, sectionId: string, updates: Partial<ProfileSection>) => {
+  console.log('✏️ Updating section:', { mode, sectionId, updates });
   
-  const deleteSection = (mode: ProfileMode, sectionId: string) => {
-    setProfile(prev => ({
+  setProfile(prev => {
+    const updatedSections = prev[mode].sections.map(section => {
+      if (section.id === sectionId) {
+        return { ...section, ...updates };
+      }
+      return section;
+    });
+    
+    const newProfile = {
       ...prev,
       [mode]: {
+        ...prev[mode],
+        sections: updatedSections,
+      },
+    };
+    
+    console.log('✅ Updated profile:', newProfile);
+    return newProfile;
+  });
+};
+  
+const deleteSection = (mode: ProfileMode, sectionId: string) => {
+  console.log('🗑️ Deleting section:', { mode, sectionId });
+  
+  setProfile(prev => {
+    const newProfile = {
+      ...prev,
+      [mode]: {
+        ...prev[mode],
         sections: prev[mode].sections.filter(section => section.id !== sectionId),
       },
-    }));
-  };
+    };
+    
+    console.log('✅ After delete:', newProfile);
+    return newProfile;
+  });
+};
+
+const reorderSections = (mode: ProfileMode, sectionIds: string[]) => {
+  console.log('🔄 Reordering sections');
+  console.log('Mode:', mode);
+  console.log('Old order:', profile[mode].sections.map(s => ({ id: s.id, name: s.name, order: s.order })));
+  console.log('New IDs order:', sectionIds);
+  
+  setProfile(prev => {
+    // Create a map of sections by ID for quick lookup
+    const sectionMap = new Map(
+      prev[mode].sections.map(section => [section.id, section])
+    );
+    
+    // Reorder sections based on the new order and update order property
+    const reorderedSections = sectionIds
+      .map(id => sectionMap.get(id))
+      .filter((section): section is ProfileSection => section !== undefined)
+      .map((section, index) => ({
+        ...section,
+        order: index,
+      }));
+    
+    console.log('✅ New order:', reorderedSections.map(s => ({ id: s.id, name: s.name, order: s.order })));
+    
+    return {
+      ...prev,
+      [mode]: {
+        ...prev[mode],
+        sections: reorderedSections,
+      },
+    };
+  });
+};
   
   // ============================================
   // CONTENT BLOCKS
   // ============================================
   
-  const addContentBlock = (
-    mode: ProfileMode, 
-    sectionId: string, 
-    block: Omit<ContentBlock, 'id' | 'order'>
-  ) => {
-    setProfile(prev => ({
+const addContentBlock = (
+  mode: ProfileMode, 
+  sectionId: string, 
+  block: Omit<ContentBlock, 'id' | 'order'>
+) => {
+  console.log('📝 Adding content block:', { mode, sectionId, block });
+  
+  setProfile(prev => {
+    const updatedSections = prev[mode].sections.map(section => {
+      if (section.id === sectionId) {
+        // Make sure contentBlocks exists
+        const currentBlocks = section.contentBlocks || [];
+        
+        const newBlock: ContentBlock = {
+          ...block,
+          id: generateId('block'),
+          order: currentBlocks.length,
+        };
+        
+        console.log('✅ Adding new block:', newBlock);
+        
+        return {
+          ...section,
+          contentBlocks: [...currentBlocks, newBlock],
+        };
+      }
+      return section;
+    });
+    
+    const newProfile = {
       ...prev,
       [mode]: {
-        sections: prev[mode].sections.map(section => {
-          if (section.id === sectionId && section.contentBlocks) {
-            return {
-              ...section,
-              contentBlocks: [
-                ...section.contentBlocks,
-                {
-                  ...block,
-                  id: generateId('block'),
-                  order: section.contentBlocks.length,
-                },
-              ],
-            };
-          }
-          return section;
-        }),
+        ...prev[mode],
+        sections: updatedSections,
       },
-    }));
-  };
+    };
+    
+    console.log('✅ New profile:', newProfile);
+    return newProfile;
+  });
+};
   
   const updateContentBlock = (
     mode: ProfileMode,
@@ -267,54 +341,80 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     }));
   };
   
-  const deleteContentBlock = (mode: ProfileMode, sectionId: string, blockId: string) => {
-    setProfile(prev => ({
+const deleteContentBlock = (mode: ProfileMode, sectionId: string, blockId: string) => {
+  console.log('🗑️ Deleting content block:', { mode, sectionId, blockId });
+  
+  setProfile(prev => {
+    // Create deep copy
+    const updatedSections = prev[mode].sections.map(section => {
+      if (section.id === sectionId && section.contentBlocks) {
+        return {
+          ...section,
+          contentBlocks: section.contentBlocks.filter(block => block.id !== blockId),
+        };
+      }
+      return section;
+    });
+    
+    const newProfile = {
       ...prev,
       [mode]: {
-        sections: prev[mode].sections.map(section => {
-          if (section.id === sectionId && section.contentBlocks) {
-            return {
-              ...section,
-              contentBlocks: section.contentBlocks.filter(block => block.id !== blockId),
-            };
-          }
-          return section;
-        }),
+        ...prev[mode],
+        sections: updatedSections,
       },
-    }));
-  };
+    };
+    
+    console.log('✅ After delete:', newProfile);
+    return newProfile;
+  });
+};
   
   // ============================================
   // TECH STACK
   // ============================================
   
-  const addTechStack = (
-    mode: ProfileMode,
-    sectionId: string,
-    tech: Omit<TechStackItem, 'id' | 'order'>
-  ) => {
-    setProfile(prev => ({
+const addTechStack = (
+  mode: ProfileMode,
+  sectionId: string,
+  tech: Omit<TechStackItem, 'id' | 'order'>
+) => {
+  console.log('🔧 Adding tech:', { mode, sectionId, tech });
+  
+  setProfile(prev => {
+    // Create a deep copy to avoid mutation
+    const updatedSections = prev[mode].sections.map(section => {
+      if (section.id === sectionId) {
+        // Make sure techStack exists
+        const currentTechStack = section.techStack || [];
+        
+        const newTech: TechStackItem = {
+          ...tech,
+          id: generateId('tech'),
+          order: currentTechStack.length,
+        };
+        
+        console.log('✅ Adding new tech:', newTech);
+        
+        return {
+          ...section,
+          techStack: [...currentTechStack, newTech],
+        };
+      }
+      return section;
+    });
+    
+    const newProfile = {
       ...prev,
       [mode]: {
-        sections: prev[mode].sections.map(section => {
-          if (section.id === sectionId && section.techStack) {
-            return {
-              ...section,
-              techStack: [
-                ...section.techStack,
-                {
-                  ...tech,
-                  id: generateId('tech'),
-                  order: section.techStack.length,
-                },
-              ],
-            };
-          }
-          return section;
-        }),
+        ...prev[mode],
+        sections: updatedSections,
       },
-    }));
-  };
+    };
+    
+    console.log('✅ New profile:', newProfile);
+    return newProfile;
+  });
+};
   
   const updateTechStack = (
     mode: ProfileMode,
@@ -340,22 +440,33 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     }));
   };
   
-  const deleteTechStack = (mode: ProfileMode, sectionId: string, techId: string) => {
-    setProfile(prev => ({
+const deleteTechStack = (mode: ProfileMode, sectionId: string, techId: string) => {
+  console.log('🗑️ Deleting tech stack:', { mode, sectionId, techId });
+  
+  setProfile(prev => {
+    // Create deep copy
+    const updatedSections = prev[mode].sections.map(section => {
+      if (section.id === sectionId && section.techStack) {
+        return {
+          ...section,
+          techStack: section.techStack.filter(tech => tech.id !== techId),
+        };
+      }
+      return section;
+    });
+    
+    const newProfile = {
       ...prev,
       [mode]: {
-        sections: prev[mode].sections.map(section => {
-          if (section.id === sectionId && section.techStack) {
-            return {
-              ...section,
-              techStack: section.techStack.filter(tech => tech.id !== techId),
-            };
-          }
-          return section;
-        }),
+        ...prev[mode],
+        sections: updatedSections,
       },
-    }));
-  };
+    };
+    
+    console.log('✅ After delete:', newProfile);
+    return newProfile;
+  });
+};
   
   // ============================================
   // BACKGROUND
@@ -378,23 +489,27 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   // SAVE / CANCEL
   // ============================================
   
-  const saveChanges = () => {
-    // Save to localStorage
-    localStorage.setItem('portfolio-profile', JSON.stringify(profile));
-    
-    // Update saved state
-    setSavedProfile(profile);
-    
-    console.log('✅ Changes saved!');
-  };
+const saveChanges = () => {
+  // Save to localStorage
+  localStorage.setItem('portfolio-profile', JSON.stringify(profile));
   
-  const discardChanges = () => {
-    // Revert to last saved state
-    setProfile(savedProfile);
-    
-    console.log('↩️ Changes discarded!');
-  };
+  // Update saved state
+  setSavedProfile(profile);
   
+  // Trigger custom event for preview update
+  window.dispatchEvent(new Event('profile-updated'));
+  
+  console.log('✅ Changes saved!');
+};
+
+// ADD THIS FUNCTION:
+const discardChanges = () => {
+  // Revert to last saved state
+  setProfile(savedProfile);
+  
+  console.log('↩️ Changes discarded!');
+};
+
   // ============================================
   // EXPORT / IMPORT
   // ============================================
@@ -433,6 +548,7 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
     addSection,
     updateSection,
     deleteSection,
+    reorderSections,
     addContentBlock,
     updateContentBlock,
     deleteContentBlock,

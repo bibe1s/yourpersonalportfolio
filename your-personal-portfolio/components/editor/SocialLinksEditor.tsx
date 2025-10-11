@@ -3,10 +3,16 @@
 import { useProfile } from '@/contexts/ProfileContext';
 import { Plus, X } from 'lucide-react';
 import { useState } from 'react';
+import { SocialLinkEditor } from '@/components/modals/SocialLinkEditor';
+import { SocialPlatform } from '@/lib/types';
 
 export function SocialLinksEditor() {
-  const { profile, deleteSocialLink } = useProfile();
+  const { profile, addSocialLink, deleteSocialLink } = useProfile();
   const [showAddModal, setShowAddModal] = useState(false);
+
+  const handleAddLink = (platform: SocialPlatform, url: string) => {
+    addSocialLink({ platform, url });
+  };
 
   return (
     <div className="space-y-4">
@@ -47,21 +53,12 @@ export function SocialLinksEditor() {
         Add Social Link
       </button>
 
-      {/* Note: We'll create the modal in Step 8 */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-bold mb-4">Add Social Link</h3>
-            <p className="text-gray-600">Modal coming in Step 8! 🚀</p>
-            <button
-              onClick={() => setShowAddModal(false)}
-              className="mt-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Modal */}
+      <SocialLinkEditor
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSave={handleAddLink}
+      />
     </div>
   );
 }

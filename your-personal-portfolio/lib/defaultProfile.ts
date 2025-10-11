@@ -7,16 +7,6 @@ import { Profile } from './types';
 export const defaultProfile: Profile = {
   id: 'default-profile',
   
-  // Personal Information
-  personal: {
-    name: 'Your Name',
-    title: 'Your Title / Role',
-    email: 'your.email@example.com',
-    phone: '+63 XXX-XXX-XXXX',
-    image: '', // Empty - user will upload
-    imageIs3D: true, // 3D effect enabled by default
-  },
-  
   // Social Links (empty array - user will add)
   socialLinks: [],
   
@@ -27,17 +17,26 @@ export const defaultProfile: Profile = {
     defaultView: 'web2', // Show Web2 first by default
   },
   
-  // Web2 Content
+  // Web2 Content (Real You - Professional)
   web2: {
+    // Personal info for Web2
+    personal: {
+      name: 'Your Real Name',
+      title: 'Frontend Developer',
+      email: 'your.real@example.com',
+      phone: '+63 XXX-XXX-XXXX',
+      image: '', // Your real photo
+      imageIs3D: true,
+    },
+    
+    // Sections for Web2
     sections: [
       // Section 1: Tech Stack
       {
         id: 'web2-section-1',
         name: 'Tech Stack',
         type: 'techStack',
-        techStack: [
-          // Empty - user will add their tech stack
-        ],
+        techStack: [],
         order: 0,
       },
       
@@ -89,17 +88,26 @@ export const defaultProfile: Profile = {
     ],
   },
   
-  // Web3 Content
+  // Web3 Content (Your Persona - Blockchain Identity)
   web3: {
+    // Personal info for Web3 (Different from Web2!)
+    personal: {
+      name: 'YourName.eth',
+      title: 'Community Ambassador',
+      email: 'your.web3@example.com',
+      phone: '', // Optional - maybe you don't share in web3
+      image: '', // Your avatar/PFP/character art
+      imageIs3D: false,
+    },
+    
+    // Sections for Web3
     sections: [
       // Section 1: Communities
       {
         id: 'web3-section-1',
         name: 'Communities',
-        type: 'techStack', // Using techStack type for community icons
-        techStack: [
-          // Empty - user will add community logos
-        ],
+        type: 'techStack', // Using techStack type for community logos
+        techStack: [],
         order: 0,
       },
       
@@ -131,7 +139,7 @@ export const defaultProfile: Profile = {
   // Theme Settings
   theme: {
     background: {
-      type: 'none', // No background by default
+      type: 'none',
       color: '#ffffff',
       speed: 50,
       density: 50,
@@ -149,15 +157,28 @@ export const defaultProfile: Profile = {
 export function createEmptyProfile(): Profile {
   return {
     ...defaultProfile,
-    id: `profile-${Date.now()}`, // Unique ID based on timestamp
-    personal: {
-      ...defaultProfile.personal,
-    },
+    id: `profile-${Date.now()}`,
     socialLinks: [],
     web2: {
+      personal: {
+        name: '',
+        title: '',
+        email: '',
+        phone: '',
+        image: '',
+        imageIs3D: true,
+      },
       sections: [],
     },
     web3: {
+      personal: {
+        name: '',
+        title: '',
+        email: '',
+        phone: '',
+        image: '',
+        imageIs3D: false,
+      },
       sections: [],
     },
   };
@@ -170,7 +191,3 @@ export function createEmptyProfile(): Profile {
 export function generateId(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
-
-// Example usage:
-// generateId('section') → "section-1234567890-a1b2c3d4e"
-// generateId('block') → "block-1234567890-x9y8z7w6v"

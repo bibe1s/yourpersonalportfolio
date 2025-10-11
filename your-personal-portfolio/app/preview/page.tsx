@@ -27,6 +27,7 @@ export default function PreviewPage() {
       }
     };
 
+    // Initial load
     loadProfile();
 
     // Listen for storage changes (when editor saves)
@@ -41,8 +42,18 @@ export default function PreviewPage() {
       }
     };
 
+    // ALSO listen for custom event (for same-tab updates)
+    const handleCustomUpdate = () => {
+      loadProfile();
+    };
+
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('profile-updated', handleCustomUpdate);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('profile-updated', handleCustomUpdate);
+    };
   }, []);
 
   // Get current sections based on mode
@@ -82,7 +93,7 @@ export default function PreviewPage() {
       {/* Main Content */}
       <div className="max-w-4xl mx-auto py-8">
         {/* Profile Card */}
-        <ProfileCard personal={profile.personal} />
+        <ProfileCard personal={profile[currentMode].personal} />
 
         {/* Social Links */}
         <SocialLinks links={profile.socialLinks} />
@@ -90,32 +101,35 @@ export default function PreviewPage() {
         {/* Divider */}
         <div className="border-t border-gray-800 my-8"></div>
 
-        {/* Sections */}
-        <div className="px-8 space-y-8">
-          {currentSections.map((section) => (
-            <div key={section.id}>
-              {section.type === 'techStack' && section.techStack ? (
-                <TechStackSection
-                  title={section.name}
-                  items={section.techStack}
-                />
-              ) : section.type === 'content' && section.contentBlocks ? (
-                <div>
-                  <h2 className="text-2xl font-bold text-white mb-4">
-                    {section.name}
-                  </h2>
-                  <div className="space-y-3">
-                    {section.contentBlocks
-                      .sort((a, b) => a.order - b.order)
-                      .map((block) => (
-                        <ContentBlock key={block.id} block={block} />
-                      ))}
-                  </div>
-                </div>
-              ) : null}
+{/* Sections */}
+<div className="px-8 space-y-8">
+  {currentSections
+    .slice()  // ← ADD THIS
+    .sort((a, b) => a.order - b.order)  // ← Make sure this exists
+    .map((section) => (
+      <div key={section.id}>
+        {section.type === 'techStack' && section.techStack ? (
+          <TechStackSection
+            title={section.name}
+            items={section.techStack}
+          />
+        ) : section.type === 'content' && section.contentBlocks ? (
+          <div>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              {section.name}
+            </h2>
+            <div className="space-y-3">
+              {section.contentBlocks
+                .sort((a, b) => a.order - b.order)
+                .map((block) => (
+                  <ContentBlock key={block.id} block={block} />
+                ))}
             </div>
-          ))}
-        </div>
+          </div>
+        ) : null}
+      </div>
+    ))}
+</div>
       </div>
     </div>
   );
