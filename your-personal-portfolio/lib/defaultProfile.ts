@@ -7,14 +7,11 @@ import { Profile } from './types';
 export const defaultProfile: Profile = {
   id: 'default-profile',
   
-  // Social Links (empty array - user will add)
-  socialLinks: [],
-  
   // Display Settings
   displaySettings: {
     showWeb2: true,
     showWeb3: true,
-    defaultView: 'web2', // Show Web2 first by default
+    defaultView: 'web2',
   },
   
   // Web2 Content (Real You - Professional)
@@ -25,13 +22,15 @@ export const defaultProfile: Profile = {
       title: 'Frontend Developer',
       email: 'your.real@example.com',
       phone: '+63 XXX-XXX-XXXX',
-      image: '', // Your real photo
+      image: '',
       imageIs3D: true,
     },
     
+    // Social Links for Web2
+    socialLinks: [],
+    
     // Sections for Web2
     sections: [
-      // Section 1: Tech Stack
       {
         id: 'web2-section-1',
         name: 'Tech Stack',
@@ -39,8 +38,6 @@ export const defaultProfile: Profile = {
         techStack: [],
         order: 0,
       },
-      
-      // Section 2: Past Projects
       {
         id: 'web2-section-2',
         name: 'Past Projects',
@@ -62,8 +59,6 @@ export const defaultProfile: Profile = {
         ],
         order: 1,
       },
-      
-      // Section 3: Educational Attainment
       {
         id: 'web2-section-3',
         name: 'Educational Attainment',
@@ -86,32 +81,41 @@ export const defaultProfile: Profile = {
         order: 2,
       },
     ],
+    
+    // ✅ Background for Web2
+    background: {
+      type: 'none',
+      color: '#ffffff',
+      speed: 50,
+      density: 50,
+      interactive: false,
+    },
   },
   
-  // Web3 Content (Your Persona - Blockchain Identity)
+  // Web3 Content (Your Persona)
   web3: {
-    // Personal info for Web3 (Different from Web2!)
+    // Personal info for Web3
     personal: {
       name: 'YourName.eth',
       title: 'Community Ambassador',
       email: 'your.web3@example.com',
-      phone: '', // Optional - maybe you don't share in web3
-      image: '', // Your avatar/PFP/character art
+      phone: '',
+      image: '',
       imageIs3D: false,
     },
     
+    // Social Links for Web3
+    socialLinks: [],
+    
     // Sections for Web3
     sections: [
-      // Section 1: Communities
       {
         id: 'web3-section-1',
         name: 'Communities',
-        type: 'techStack', // Using techStack type for community logos
+        type: 'techStack',
         techStack: [],
         order: 0,
       },
-      
-      // Section 2: Web3 Footprints
       {
         id: 'web3-section-2',
         name: 'Web3 Footprints',
@@ -134,19 +138,21 @@ export const defaultProfile: Profile = {
         order: 1,
       },
     ],
-  },
-  
-  // Theme Settings
-  theme: {
+    
+    // ✅ Background for Web3
     background: {
       type: 'none',
-      color: '#ffffff',
+      color: '#000000',
       speed: 50,
       density: 50,
       interactive: false,
     },
-    accentColor: '#3b82f6', // Blue
-    textColor: '#000000', // Black
+  },
+  
+  // Theme Settings (just colors, no background here anymore)
+  theme: {
+    accentColor: '#3b82f6',
+    textColor: '#000000',
   },
 };
 
@@ -158,7 +164,6 @@ export function createEmptyProfile(): Profile {
   return {
     ...defaultProfile,
     id: `profile-${Date.now()}`,
-    socialLinks: [],
     web2: {
       personal: {
         name: '',
@@ -168,7 +173,15 @@ export function createEmptyProfile(): Profile {
         image: '',
         imageIs3D: true,
       },
+      socialLinks: [],
       sections: [],
+      background: {
+        type: 'none',
+        color: '#ffffff',
+        speed: 50,
+        density: 50,
+        interactive: false,
+      },
     },
     web3: {
       personal: {
@@ -179,7 +192,15 @@ export function createEmptyProfile(): Profile {
         image: '',
         imageIs3D: false,
       },
+      socialLinks: [],
       sections: [],
+      background: {
+        type: 'none',
+        color: '#000000',
+        speed: 50,
+        density: 50,
+        interactive: false,
+      },
     },
   };
 }

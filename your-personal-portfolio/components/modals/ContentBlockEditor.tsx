@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Modal } from './Modal';
 import { ContentBlockType } from '@/lib/types';
 
@@ -8,13 +8,41 @@ interface ContentBlockEditorProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (type: ContentBlockType, content: string, duration?: string) => void;
+  onDelete?: () => void; // ← NEW: Optional delete function
+  initialData?: { // ← NEW: Initial data for editing
+    type: ContentBlockType;
+    content: string;
+    duration?: string;
+  };
 }
 
-export function ContentBlockEditor({ isOpen, onClose, onSave }: ContentBlockEditorProps) {
+export function ContentBlockEditor({ 
+  isOpen, 
+  onClose, 
+  onSave, 
+  onDelete,
+  initialData 
+}: ContentBlockEditorProps) {
   const [type, setType] = useState<ContentBlockType>('title');
   const [content, setContent] = useState('');
   const [hasDuration, setHasDuration] = useState(false);
   const [duration, setDuration] = useState('');
+
+  // Load initial data when editing
+  useEffect(() => {
+    if (initialData) {
+      setType(initialData.type);
+      setContent(initialData.content);
+      setHasDuration(!!initialData.duration);
+      setDuration(initialData.duration || '');
+    } else {
+      // Reset when adding new
+      setType('title');
+      setContent('');
+      setHasDuration(false);
+      setDuration('');
+    }
+  }, [initialData, isOpen]);
 
   const handleSave = () => {
     if (!content.trim()) return;
@@ -25,25 +53,36 @@ export function ContentBlockEditor({ isOpen, onClose, onSave }: ContentBlockEdit
       hasDuration && duration.trim() ? duration : undefined
     );
 
-    // Reset and close
-    setType('title');
-    setContent('');
-    setHasDuration(false);
-    setDuration('');
-    onClose();
+    handleClose();
   };
 
   const handleClose = () => {
-    // Reset on close
-    setType('title');
-    setContent('');
-    setHasDuration(false);
-    setDuration('');
+    // Reset on close only if not editing
+    if (!initialData) {
+      setType('title');
+      setContent('');
+      setHasDuration(false);
+      setDuration('');
+    }
     onClose();
   };
 
+  const handleDelete = () => {
+    if (onDelete && confirm('Are you sure you want to delete this block?')) {
+      onDelete();
+      handleClose();
+    }
+  };
+
+  const isEditing = !!initialData;
+
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Add Content Block" maxWidth="md">
+    <Modal 
+      isOpen={isOpen} 
+      onClose={handleClose} 
+      title={isEditing ? "Edit Content Block" : "Add Content Block"} 
+      maxWidth="md"
+    >
       <div className="p-6 space-y-6">
         {/* Type Selection */}
         <div>
@@ -101,24 +140,24 @@ export function ContentBlockEditor({ isOpen, onClose, onSave }: ContentBlockEdit
           </p>
         </div>
 
-        {/* Duration Toggle */}
-        <div className="flex items-start gap-3 p-4 border rounded-lg">
-          <input
-            type="checkbox"
-            id="hasDuration"
-            checked={hasDuration}
-            onChange={(e) => setHasDuration(e.target.checked)}
-            className="w-4 h-4 mt-1"
-          />
-          <div className="flex-1">
-            <label htmlFor="hasDuration" className="font-medium cursor-pointer">
-              Add Duration
-            </label>
-            <p className="text-xs text-gray-500 mt-1">
-              Add a date or time period (e.g., "2023 - 2024", "Jan 2024")
-            </p>
-          </div>
-        </div>
+{/* Duration Toggle */}
+<div className="flex items-start gap-3 p-4 border rounded-lg">
+  <input
+    type="checkbox"
+    id="hasDuration"
+    checked={hasDuration}
+    onChange={(e) => setHasDuration(e.target.checked)}
+    className="w-4 h-4 mt-1"
+  />
+  <div className="flex-1">
+    <p className="font-medium">
+      Add Duration
+    </p>
+    <p className="text-xs text-gray-500 mt-1">
+      Add a date or time period (e.g., "2023 - 2024", "Jan 2024")
+    </p>
+  </div>
+</div>
 
         {/* Duration Input (conditional) */}
         {hasDuration && (
@@ -161,20 +200,32 @@ export function ContentBlockEditor({ isOpen, onClose, onSave }: ContentBlockEdit
         </div>
 
         {/* Actions */}
-        <div className="flex gap-3 justify-end pt-4 border-t">
-          <button
-            onClick={handleClose}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={!content.trim()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Add Block
-          </button>
+        <div className="flex gap-3 justify-between pt-4 border-t">
+          {/* Delete button (only when editing) */}
+          {isEditing && onDelete && (
+            <button
+              onClick={handleDelete}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+            >
+              Delete
+            </button>
+          )}
+          
+          <div className="flex gap-3 ml-auto">
+            <button
+              onClick={handleClose}
+              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={!content.trim()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isEditing ? 'Update' : 'Add Block'}
+            </button>
+          </div>
         </div>
       </div>
     </Modal>

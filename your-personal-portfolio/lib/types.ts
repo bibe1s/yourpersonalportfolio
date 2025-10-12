@@ -107,18 +107,21 @@ export interface ProfileDisplaySettings {
 // ============================================
 
 export interface Profile {
-  id: string;                    // Unique profile ID
-  socialLinks: SocialLink[];     // Array of social links
+  id: string;                    // Unique profile ID   // Array of social links
   displaySettings: ProfileDisplaySettings;
   
   // Separate content AND personal info for Web2 and Web3
   web2: {
     personal: PersonalInfo;      // ✅ Web2 has its own personal info
+    socialLinks: SocialLink[];  // Web2 social links
     sections: ProfileSection[];  // Web2 content sections
+    background: BackgroundConfig;
   };
   web3: {
     personal: PersonalInfo;      // ✅ Web3 has its own personal info
+    socialLinks: SocialLink[];  // Web3 social links
     sections: ProfileSection[];  // Web3 content sections
+    background: BackgroundConfig;
   };
   
   // Visual theme

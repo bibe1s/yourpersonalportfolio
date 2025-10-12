@@ -7,23 +7,33 @@ import { SocialLinkEditor } from '@/components/modals/SocialLinkEditor';
 import { SocialPlatform } from '@/lib/types';
 
 export function SocialLinksEditor() {
-  const { profile, addSocialLink, deleteSocialLink } = useProfile();
+  const { profile, currentMode, addSocialLink, deleteSocialLink } = useProfile();
   const [showAddModal, setShowAddModal] = useState(false);
 
+  // Get social links for current mode
+const socialLinks = profile[currentMode]?.socialLinks || [];
+
   const handleAddLink = (platform: SocialPlatform, url: string) => {
-    addSocialLink({ platform, url });
+    addSocialLink(currentMode, { platform, url });
   };
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold">Social Links</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">Social Links</h2>
+        <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded">
+          {currentMode === 'web2' ? '👔 Professional' : '🎭 Community'}
+        </span>
+      </div>
 
       {/* Current Links */}
       <div className="space-y-2">
-        {profile.socialLinks.length === 0 ? (
-          <p className="text-sm text-gray-500">No social links yet. Add one below!</p>
+        {socialLinks.length === 0 ? (
+          <p className="text-sm text-gray-500">
+            No social links yet for {currentMode === 'web2' ? 'Web2' : 'Web3'}
+          </p>
         ) : (
-          profile.socialLinks.map((link) => (
+          socialLinks.map((link) => (
             <div
               key={link.id}
               className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50"
@@ -33,7 +43,7 @@ export function SocialLinksEditor() {
                 <p className="text-sm text-gray-500 truncate">{link.url}</p>
               </div>
               <button
-                onClick={() => deleteSocialLink(link.id)}
+                onClick={() => deleteSocialLink(currentMode, link.id)}
                 className="p-2 text-red-600 hover:bg-red-50 rounded"
                 title="Delete"
               >

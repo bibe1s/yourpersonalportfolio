@@ -32,15 +32,15 @@ interface ProfileContextType {
 updatePersonalInfo: (mode: ProfileMode, updates: Partial<PersonalInfo>) => void;
   
   // Social Links
-  addSocialLink: (link: Omit<SocialLink, 'id' | 'order'>) => void;
-  updateSocialLink: (linkId: string, updates: Partial<SocialLink>) => void;
-  deleteSocialLink: (linkId: string) => void;
+  addSocialLink: (mode: ProfileMode, link: Omit<SocialLink, 'id' | 'order'>) => void;
+  updateSocialLink: (mode: ProfileMode, linkId: string, updates: Partial<SocialLink>) => void;
+  deleteSocialLink: (mode: ProfileMode, linkId: string) => void;
   
   // Display Settings
   updateDisplaySettings: (settings: Partial<ProfileDisplaySettings>) => void;
   
   // Sections
-  addSection: (mode: ProfileMode, section: Omit<ProfileSection, 'id' | 'order'>) => void;
+  addSection: (mode: ProfileMode, section: Omit<ProfileSection, 'id' | 'order'>, insertAfter?: string) => void;
   updateSection: (mode: ProfileMode, sectionId: string, updates: Partial<ProfileSection>) => void;
   deleteSection: (mode: ProfileMode, sectionId: string) => void;
   reorderSections: (mode: ProfileMode, sectionIds: string[]) => void; 
@@ -130,35 +130,49 @@ const updatePersonalInfo = (mode: ProfileMode, updates: Partial<PersonalInfo>) =
   // SOCIAL LINKS
   // ============================================
   
-  const addSocialLink = (link: Omit<SocialLink, 'id' | 'order'>) => {
-    setProfile(prev => ({
+const addSocialLink = (mode: ProfileMode, link: Omit<SocialLink, 'id' | 'order'>) => {
+  setProfile(prev => {
+    // Safety check - make sure socialLinks exists
+    const currentSocialLinks = prev[mode]?.socialLinks || [];
+    
+    return {
       ...prev,
-      socialLinks: [
-        ...prev.socialLinks,
-        {
-          ...link,
-          id: generateId('social'),
-          order: prev.socialLinks.length,
-        },
-      ],
-    }));
-  };
-  
-  const updateSocialLink = (linkId: string, updates: Partial<SocialLink>) => {
-    setProfile(prev => ({
-      ...prev,
-      socialLinks: prev.socialLinks.map(link =>
+      [mode]: {
+        ...prev[mode],
+        socialLinks: [
+          ...currentSocialLinks,
+          {
+            ...link,
+            id: generateId('social'),
+            order: currentSocialLinks.length,
+          },
+        ],
+      },
+    };
+  });
+};
+
+const updateSocialLink = (mode: ProfileMode, linkId: string, updates: Partial<SocialLink>) => {
+  setProfile(prev => ({
+    ...prev,
+    [mode]: {
+      ...prev[mode],
+      socialLinks: prev[mode].socialLinks.map(link =>
         link.id === linkId ? { ...link, ...updates } : link
       ),
-    }));
-  };
-  
-  const deleteSocialLink = (linkId: string) => {
-    setProfile(prev => ({
-      ...prev,
-      socialLinks: prev.socialLinks.filter(link => link.id !== linkId),
-    }));
-  };
+    },
+  }));
+};
+
+const deleteSocialLink = (mode: ProfileMode, linkId: string) => {
+  setProfile(prev => ({
+    ...prev,
+    [mode]: {
+      ...prev[mode],
+      socialLinks: prev[mode].socialLinks.filter(link => link.id !== linkId),
+    },
+  }));
+};
   
   // ============================================
   // DISPLAY SETTINGS
@@ -178,24 +192,52 @@ const updatePersonalInfo = (mode: ProfileMode, updates: Partial<PersonalInfo>) =
   // SECTIONS
   // ============================================
   
-  const addSection = (mode: ProfileMode, section: Omit<ProfileSection, 'id' | 'order'>) => {
-    setProfile(prev => {
-      const sections = prev[mode].sections;
-      return {
-        ...prev,
-        [mode]: {
-          sections: [
-            ...sections,
-            {
-              ...section,
-              id: generateId('section'),
-              order: sections.length,
-            },
-          ],
-        },
-      };
-    });
-  };
+const addSection = (
+  mode: ProfileMode, 
+  section: Omit<ProfileSection, 'id' | 'order'>,
+  insertAfter?: string // ← NEW: Optional section ID to insert after
+) => {
+  setProfile(prev => {
+    const sections = prev[mode].sections;
+    
+    let insertIndex = 0; // Default: insert at top
+    
+    if (insertAfter) {
+      const afterIndex = sections.findIndex(s => s.id === insertAfter);
+      if (afterIndex !== -1) {
+        insertIndex = afterIndex + 1;
+      }
+    }
+    
+    // Create new section
+    const newSection: ProfileSection = {
+      ...section,
+      id: generateId('section'),
+      order: insertIndex,
+    };
+    
+    // Insert section at the correct position
+    const updatedSections = [
+      ...sections.slice(0, insertIndex),
+      newSection,
+      ...sections.slice(insertIndex),
+    ];
+    
+    // Reorder all sections
+    const reorderedSections = updatedSections.map((s, index) => ({
+      ...s,
+      order: index,
+    }));
+    
+    return {
+      ...prev,
+      [mode]: {
+        ...prev[mode],
+        sections: reorderedSections,
+      },
+    };
+  });
+};
   
 const updateSection = (mode: ProfileMode, sectionId: string, updates: Partial<ProfileSection>) => {
   console.log('✏️ Updating section:', { mode, sectionId, updates });
@@ -317,29 +359,39 @@ const addContentBlock = (
   });
 };
   
-  const updateContentBlock = (
-    mode: ProfileMode,
-    sectionId: string,
-    blockId: string,
-    updates: Partial<ContentBlock>
-  ) => {
-    setProfile(prev => ({
+const updateContentBlock = (
+  mode: ProfileMode,
+  sectionId: string,
+  blockId: string,
+  updates: Partial<ContentBlock>
+) => {
+  console.log('✏️ Updating content block:', { mode, sectionId, blockId, updates });
+  
+  setProfile(prev => {
+    const updatedSections = prev[mode].sections.map(section => {
+      if (section.id === sectionId && section.contentBlocks) {
+        return {
+          ...section,
+          contentBlocks: section.contentBlocks.map(block =>
+            block.id === blockId ? { ...block, ...updates } : block
+          ),
+        };
+      }
+      return section;
+    });
+    
+    const newProfile = {
       ...prev,
       [mode]: {
-        sections: prev[mode].sections.map(section => {
-          if (section.id === sectionId && section.contentBlocks) {
-            return {
-              ...section,
-              contentBlocks: section.contentBlocks.map(block =>
-                block.id === blockId ? { ...block, ...updates } : block
-              ),
-            };
-          }
-          return section;
-        }),
+        ...prev[mode],
+        sections: updatedSections,
       },
-    }));
-  };
+    };
+    
+    console.log('✅ Updated profile:', newProfile);
+    return newProfile;
+  });
+};
   
 const deleteContentBlock = (mode: ProfileMode, sectionId: string, blockId: string) => {
   console.log('🗑️ Deleting content block:', { mode, sectionId, blockId });
@@ -416,29 +468,30 @@ const addTechStack = (
   });
 };
   
-  const updateTechStack = (
-    mode: ProfileMode,
-    sectionId: string,
-    techId: string,
-    updates: Partial<TechStackItem>
-  ) => {
-    setProfile(prev => ({
-      ...prev,
-      [mode]: {
-        sections: prev[mode].sections.map(section => {
-          if (section.id === sectionId && section.techStack) {
-            return {
-              ...section,
-              techStack: section.techStack.map(tech =>
-                tech.id === techId ? { ...tech, ...updates } : tech
-              ),
-            };
-          }
-          return section;
-        }),
-      },
-    }));
-  };
+const updateTechStack = (
+  mode: ProfileMode,
+  sectionId: string,
+  techId: string,
+  updates: Partial<TechStackItem>
+) => {
+  setProfile(prev => ({
+    ...prev,
+    [mode]: {
+      ...prev[mode], 
+      sections: prev[mode].sections.map(section => {
+        if (section.id === sectionId && section.techStack) {
+          return {
+            ...section,
+            techStack: section.techStack.map(tech =>
+              tech.id === techId ? { ...tech, ...updates } : tech
+            ),
+          };
+        }
+        return section;
+      }),
+    },
+  }));
+};
   
 const deleteTechStack = (mode: ProfileMode, sectionId: string, techId: string) => {
   console.log('🗑️ Deleting tech stack:', { mode, sectionId, techId });

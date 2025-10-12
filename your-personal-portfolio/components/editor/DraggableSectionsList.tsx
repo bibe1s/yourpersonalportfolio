@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { ContentBlockEditor } from '@/components/modals/ContentBlockEditor';
 import { TechStackEditor } from '@/components/modals/TechStackEditor';
 import { SectionEditor } from '@/components/modals/SectionEditor';
+import { AddSectionModal } from '@/components/modals/AddSectionModal';
 import { ContentBlockType } from '@/lib/types';
 import {
   DndContext,
@@ -40,6 +41,7 @@ function DraggableSection({ section, mode }: any) {
   const {
     addContentBlock,
     deleteContentBlock,
+    updateContentBlock,
     addTechStack,
     deleteTechStack,
     deleteSection,
@@ -49,6 +51,8 @@ function DraggableSection({ section, mode }: any) {
   const [showAddBlockModal, setShowAddBlockModal] = useState(false);
   const [showAddTechModal, setShowAddTechModal] = useState(false);
   const [showEditSectionModal, setShowEditSectionModal] = useState(false);
+  const [editingBlock, setEditingBlock] = useState<any>(null);
+  const [showEditBlockModal, setShowEditBlockModal] = useState(false);
 
   const handleSaveSectionName = (name: string) => {
   updateSection(mode, section.id, { name });
@@ -61,8 +65,37 @@ function DraggableSection({ section, mode }: any) {
   };
 
   const handleSaveBlock = (type: ContentBlockType, content: string, duration?: string) => {
+  if (editingBlock) {
+    // Update existing block
+    updateContentBlock(mode, section.id, editingBlock.id, {
+      type,
+      content,
+      duration,
+    });
+  } else {
+    // Add new block
     addContentBlock(mode, section.id, { type, content, duration });
-  };
+  }
+};
+
+const handleEditBlock = (block: any) => {
+  setEditingBlock(block);
+  setShowEditBlockModal(true);
+};
+
+const handleDeleteBlock = () => {
+  if (editingBlock) {
+    deleteContentBlock(mode, section.id, editingBlock.id);
+    setEditingBlock(null);
+    setShowEditBlockModal(false);
+  }
+};
+
+const handleCloseEditBlock = () => {
+  setEditingBlock(null);
+  setShowEditBlockModal(false);
+};
+
 
   const handleSaveTech = (name: string, iconUrl: string) => {
     addTechStack(mode, section.id, { name, icon: iconUrl });
@@ -124,6 +157,7 @@ function DraggableSection({ section, mode }: any) {
                 .map((block: any) => (
                   <div
                     key={block.id}
+                    onClick={() => handleEditBlock(block)}
                     className="p-3 bg-gray-50 rounded border border-gray-200 cursor-pointer hover:border-blue-300 transition-colors"
                   >
                     <div className="flex items-start justify-between">
@@ -138,13 +172,13 @@ function DraggableSection({ section, mode }: any) {
                           </p>
                         )}
                       </div>
-                      <button
+                      {/* <button
                         onClick={() => deleteContentBlock(mode, section.id, block.id)}
                         className="p-1 text-red-600 hover:bg-red-50 rounded"
                         title="Delete block"
                       >
                         <X className="w-4 h-4" />
-                      </button>
+                      </button> */}
                     </div>
                   </div>
                 ))
@@ -224,14 +258,33 @@ function DraggableSection({ section, mode }: any) {
         onClose={() => setShowEditSectionModal(false)}
         onSave={handleSaveSectionName}
         currentName={section.name}
-    />
+      />
+
+      <ContentBlockEditor
+        isOpen={showAddBlockModal}
+        onClose={() => setShowAddBlockModal(false)}
+        onSave={handleSaveBlock}
+      />
+
+      <ContentBlockEditor
+        isOpen={showEditBlockModal}
+        onClose={handleCloseEditBlock}
+        onSave={handleSaveBlock}
+        onDelete={handleDeleteBlock}
+        initialData={editingBlock ? {
+          type: editingBlock.type,
+          content: editingBlock.content,
+          duration: editingBlock.duration,
+        } : undefined}
+      />
     </>
   );
 }
 
 // Main Component
 export function DraggableSectionsList() {
-  const { profile, currentMode, reorderSections } = useProfile();
+  const { profile, currentMode, reorderSections, addSection } = useProfile();
+  const [showAddSectionModal, setShowAddSectionModal] = useState(false);
 
   const currentSections = profile[currentMode].sections;
 
@@ -261,41 +314,93 @@ export function DraggableSectionsList() {
     }
   };
 
+  const handleAddSection = (name: string, type: 'content' | 'techStack', insertAfter?: string) => {
+    addSection(
+      currentMode,
+      {
+        name,
+        type,
+        contentBlocks: type === 'content' ? [] : undefined,
+        techStack: type === 'techStack' ? [] : undefined,
+      },
+      insertAfter
+    );
+  };
+
   if (currentSections.length === 0) {
     return (
-      <div className="text-center p-8 border-2 border-dashed rounded-lg">
-        <p className="text-xl mb-2">📝</p>
-        <p className="text-gray-500 mb-4">No sections yet!</p>
-        <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-          + Create Your First Section
-        </button>
-      </div>
+      <>
+        <div className="text-center p-8 border-2 border-dashed rounded-lg">
+          <p className="text-xl mb-2">📝</p>
+          <p className="text-gray-500 mb-4">No sections yet!</p>
+          <button 
+            onClick={() => setShowAddSectionModal(true)}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            + Create Your First Section
+          </button>
+        </div>
+
+        <AddSectionModal
+          isOpen={showAddSectionModal}
+          onClose={() => setShowAddSectionModal(false)}
+          onSave={handleAddSection}
+          existingSections={currentSections}
+        />
+      </>
     );
   }
 
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
-      <SortableContext
-        items={currentSections.map((s) => s.id)}
-        strategy={verticalListSortingStrategy}
+    <>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
       >
-        <div className="space-y-4">
-          {currentSections
-            .slice()
-            .sort((a, b) => a.order - b.order)
-            .map((section) => (
-              <DraggableSection
-                key={section.id}
-                section={section}
-                mode={currentMode}
-              />
-            ))}
-        </div>
-      </SortableContext>
-    </DndContext>
+        <SortableContext
+          items={currentSections.map((s) => s.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          {/* Add Section Button at Top */}
+          <button
+            onClick={() => setShowAddSectionModal(true)}
+            className="w-full py-3 mb-4 border-2 border-dashed border-blue-400 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 text-blue-600 font-medium"
+          >
+            <Plus className="w-5 h-5" />
+            Add Section at Top
+          </button>
+
+          <div className="space-y-4">
+            {currentSections
+              .slice()
+              .sort((a, b) => a.order - b.order)
+              .map((section) => (
+                <DraggableSection
+                  key={section.id}
+                  section={section}
+                  mode={currentMode}
+                />
+              ))}
+          </div>
+
+          {/* Add Section Button at Bottom */}
+          <button
+            onClick={() => setShowAddSectionModal(true)}
+            className="w-full py-3 mt-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 text-gray-600 hover:text-blue-600 font-medium"
+          >
+            <Plus className="w-5 h-5" />
+            Add Section at Bottom
+          </button>
+        </SortableContext>
+      </DndContext>
+
+      <AddSectionModal
+        isOpen={showAddSectionModal}
+        onClose={() => setShowAddSectionModal(false)}
+        onSave={handleAddSection}
+        existingSections={currentSections}
+      />
+    </>
   );
 }

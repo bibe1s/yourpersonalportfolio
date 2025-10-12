@@ -41,16 +41,20 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = 'md' }: Mod
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-    {/* Backdrop */}
-        <div
+      {/* Backdrop */}
+      <div
         className="absolute inset-0 bg-black/30 backdrop-blur-sm transition-opacity"
-        onClick={onClose}
-        />
-    {/* Modal */}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
+      />
+
+      {/* Modal */}
       <div
         className={`relative bg-white rounded-lg shadow-xl ${maxWidthClasses[maxWidth]} w-full max-h-[90vh] overflow-hidden`}
       >
-    {/* Header */}
+        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-bold">{title}</h2>
           <button
@@ -62,8 +66,11 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = 'md' }: Mod
           </button>
         </div>
 
-    {/* Content */}
-        <div className="overflow-y-auto max-h-[calc(90vh-8rem)]">
+        {/* Content */}
+        <div 
+          className="overflow-y-auto max-h-[calc(90vh-8rem)]"
+          onMouseDown={(e) => e.stopPropagation()}
+        >
           {children}
         </div>
       </div>

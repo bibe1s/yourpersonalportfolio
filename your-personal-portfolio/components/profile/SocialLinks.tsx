@@ -37,7 +37,7 @@ const iconMap = {
 };
 
 export function SocialLinks({ links }: SocialLinksProps) {
-  if (links.length === 0) return null;
+  if (!links || links.length === 0) return null;
 
   return (
     <div className="flex justify-center gap-4 p-6">
