@@ -1,14 +1,36 @@
 "use client";
 
+import { useState } from 'react'; // ← MISSING THIS
+import { useProfile } from '@/contexts/ProfileContext'; // ← MISSING THIS
 import { ModeToggle } from './ModeToggle';
 import { PersonalInfoEditor } from './PersonalInfoEditor';
 import { SocialLinksEditor } from './SocialLinksEditor';
 import { ProfileDisplaySettings } from './ProfileDisplaySettings';
 import { DraggableSectionsList } from './DraggableSectionsList';
+import { BackgroundSelector } from '@/components/modals/BackgroundSelector';
 import { SaveCancelBar } from './SaveCancelBar';
 import { Palette, ExternalLink } from 'lucide-react';
 
 export function EditorPanel() {
+  const { profile, currentMode, updateBackground } = useProfile();
+  const [showBackgroundModal, setShowBackgroundModal] = useState(false);
+
+  const handleSaveBackground = (
+    type: any,
+    color: string,
+    speed: number,
+    density: number,
+    interactive: boolean
+  ) => {
+    updateBackground(currentMode, {
+      type,
+      color,
+      speed,
+      density,
+      interactive,
+    });
+  };
+
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
@@ -25,6 +47,7 @@ export function EditorPanel() {
           </button>
           
           <button
+            onClick={() => setShowBackgroundModal(true)} // ← FIX THIS (was setBackgroundModalOpen)
             className="p-2 hover:bg-gray-100 rounded-lg"
             title="Change Background"
           >
@@ -53,6 +76,14 @@ export function EditorPanel() {
 
       {/* Fixed Save/Cancel Bar */}
       <SaveCancelBar />
+
+      {/* Background Selector Modal */}
+      <BackgroundSelector
+        isOpen={showBackgroundModal}
+        onClose={() => setShowBackgroundModal(false)}
+        onSave={handleSaveBackground}
+        currentConfig={profile[currentMode].background}
+      />    
     </div>
   );
 }

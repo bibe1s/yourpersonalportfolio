@@ -525,18 +525,25 @@ const deleteTechStack = (mode: ProfileMode, sectionId: string, techId: string) =
   // BACKGROUND
   // ============================================
   
-  const updateBackground = (config: Partial<BackgroundConfig>) => {
-    setProfile(prev => ({
+const updateBackground = (mode: ProfileMode, config: Partial<BackgroundConfig>) => {
+  console.log('🎨 Updating background:', { mode, config });
+  
+  setProfile(prev => {
+    const newProfile = {
       ...prev,
-      theme: {
-        ...prev.theme,
+      [mode]: {
+        ...prev[mode],
         background: {
-          ...prev.theme.background,
+          ...prev[mode].background,
           ...config,
         },
       },
-    }));
-  };
+    };
+    
+    console.log('✅ New background:', newProfile[mode].background);
+    return newProfile;
+  });
+};
   
   // ============================================
   // SAVE / CANCEL
