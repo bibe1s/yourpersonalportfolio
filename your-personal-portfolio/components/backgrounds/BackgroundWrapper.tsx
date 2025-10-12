@@ -10,23 +10,23 @@ interface BackgroundWrapperProps {
 
 export function BackgroundWrapper({ config, children }: BackgroundWrapperProps) {
   return (
-    <div className="relative w-full h-full">
-      {/* Background Layer */}
+    <div className="relative w-full min-h-screen">
+      {/* Background Layer - Fixed position */}
       {config.type !== 'none' && (
-        <div className="absolute inset-0 overflow-hidden">
+        <div className="fixed inset-0 z-0">
           {config.type === 'particles' && (
             <ParticlesBackground
-              color={config.color}
-              speed={config.speed}
-              density={config.density}
-              interactive={config.interactive}
+                color={config.color || '#3b82f6'}
+                speed={config.speed || 50}
+                density={config.density || 50}
+                interactive={config.interactive || true}
             />
-          )}
+            )}
           {/* More backgrounds will go here later */}
         </div>
       )}
 
-      {/* Content Layer */}
+      {/* Content Layer - Scrollable */}
       <div className="relative z-10">
         {children}
       </div>

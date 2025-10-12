@@ -126,7 +126,6 @@ export interface Profile {
   
   // Visual theme
   theme: {
-    background: BackgroundConfig;
     accentColor: string;         // Main color for buttons, etc.
     textColor: string;           // Text color
   };
