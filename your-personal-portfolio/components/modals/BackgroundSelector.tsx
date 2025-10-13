@@ -1,190 +1,164 @@
-"use client";
-
 import { useState } from 'react';
-import { Modal } from './Modal';
-import { BackgroundType } from '@/lib/types';
+import { X } from 'lucide-react';
+
+// Import all your backgrounds
+import LiquidEther from '@/components/backgrounds/LiquidEther';
+import Prism from '@/components/backgrounds/Prism';
+import DarkVeil from '@/components/backgrounds/DarkVeil';
+import LightRays from '@/components/backgrounds/LightRays';
+import Aurora from '@/components/backgrounds/Aurora';
+import Plasma from '@/components/backgrounds/Plasma';
+import Particles from '@/components/backgrounds/Particles';
+import GradientBlinds from '@/components/backgrounds/GradientBlinds';
+import Galaxy from '@/components/backgrounds/Galaxy';
+import FaultyTerminal from '@/components/backgrounds/FaultyTerminal';
+import RippleGrid from '@/components/backgrounds/RippleGrid';
+import Threads from '@/components/backgrounds/Threads';
+import Irisdescence from '@/components/backgrounds/Irisdescence';
+import PrismaticBurst from '@/components/backgrounds/PrismaticBurst';
+import Orb from '@/components/backgrounds/Orb';
+import LetterGlitch from '@/components/backgrounds/LetterGlitch';
+import LiquidChrome from '@/components/backgrounds/LiquidChrome';
+import Balatro from '@/components/backgrounds/Balatro';
+
+interface BackgroundOption {
+  id: string;
+  name: string;
+  component: React.ComponentType<any>;
+  category: 'OGL' | 'THREE' | 'OTHER';
+}
+
+const backgrounds: BackgroundOption[] = [
+  { id: 'prism', name: 'Prism', component: Prism, category: 'OGL' },
+  { id: 'dark-veil', name: 'Dark Veil', component: DarkVeil, category: 'OGL' },
+  { id: 'light-rays', name: 'Light Rays', component: LightRays, category: 'OGL' },
+  { id: 'aurora', name: 'Aurora', component: Aurora, category: 'OGL' },
+  { id: 'plasma', name: 'Plasma', component: Plasma, category: 'OGL' },
+  { id: 'particles', name: 'Particles', component: Particles, category: 'OGL' },
+  { id: 'gradient-blinds', name: 'Gradient Blinds', component: GradientBlinds, category: 'OGL' },
+  { id: 'galaxy', name: 'Galaxy', component: Galaxy, category: 'OGL' },
+  { id: 'faulty-terminal', name: 'Faulty Terminal', component: FaultyTerminal, category: 'OGL' },
+  { id: 'ripple-grid', name: 'Ripple Grid', component: RippleGrid, category: 'OGL' },
+  { id: 'threads', name: 'Threads', component: Threads, category: 'OGL' },
+  { id: 'irisdescence', name: 'Irisdescence', component: Irisdescence, category: 'OGL' },
+  { id: 'prismatic-burst', name: 'Prismatic Burst', component: PrismaticBurst, category: 'OGL' },
+  { id: 'orb', name: 'Orb', component: Orb, category: 'OGL' },
+  { id: 'liquid-chrome', name: 'Liquid Chrome', component: LiquidChrome, category: 'OGL' },
+  { id: 'balatro', name: 'Balatro', component: Balatro, category: 'OGL' },
+  { id: 'liquid-ether', name: 'Liquid Ether', component: LiquidEther, category: 'THREE' },
+  { id: 'letter-glitch', name: 'Letter Glitch', component: LetterGlitch, category: 'OTHER' },
+];
 
 interface BackgroundSelectorProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (type: BackgroundType, color: string, speed: number, density: number, interactive: boolean) => void;
-  currentConfig: {
-    type: BackgroundType;
-    color: string;
-    speed: number;
-    density: number;
-    interactive: boolean;
-  };
+  onSave: (type: string, color: string, speed: number, density: number, interactive: boolean) => void;
+  currentConfig: any;
 }
 
-const BACKGROUND_OPTIONS = [
-  { type: 'none' as BackgroundType, name: 'None', icon: '⬜', description: 'Solid color' },
-  { type: 'particles' as BackgroundType, name: 'Particles', icon: '✨', description: 'Floating connected dots' },
-  { type: 'grid' as BackgroundType, name: 'Grid', icon: '📐', description: 'Animated grid lines (Coming soon)' },
-  { type: 'gradient' as BackgroundType, name: 'Gradient', icon: '🌈', description: 'Moving gradient mesh (Coming soon)' },
-  { type: 'meteors' as BackgroundType, name: 'Meteors', icon: '☄️', description: 'Shooting stars (Coming soon)' },
-  { type: 'dots' as BackgroundType, name: 'Dots', icon: '⚫', description: 'Dot pattern (Coming soon)' },
-  { type: 'ripple' as BackgroundType, name: 'Ripple', icon: '💧', description: 'Water ripple effect (Coming soon)' },
-];
+export function BackgroundSelector({ isOpen, onClose, onSave, currentConfig }: BackgroundSelectorProps) {
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string>(currentConfig?.type || 'aurora');
 
-export function BackgroundSelector({ 
-  isOpen, 
-  onClose, 
-  onSave,
-  currentConfig 
-}: BackgroundSelectorProps) {
-  const [selectedType, setSelectedType] = useState<BackgroundType>(currentConfig.type);
-  const [color, setColor] = useState(currentConfig.color);
-  const [speed, setSpeed] = useState(currentConfig.speed);
-  const [density, setDensity] = useState(currentConfig.density);
-  const [interactive, setInteractive] = useState(currentConfig.interactive);
+  if (!isOpen) return null;
 
-  const handleSave = () => {
-    onSave(selectedType, color, speed, density, interactive);
+  const handleSelect = (id: string) => {
+    setSelectedId(id);
+    // Save with default settings - you can customize these
+    onSave(id, '#3b82f6', 50, 50, true);
     onClose();
   };
 
-  const isComingSoon = (type: BackgroundType) => {
-    return !['none', 'particles'].includes(type);
-  };
-
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Background Settings" maxWidth="lg">
-      <div className="p-6 space-y-6">
-        {/* Background Type Selection */}
-        <div>
-          <label className="block text-sm font-medium mb-3">
-            Choose Background Type:
-          </label>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {BACKGROUND_OPTIONS.map((option) => (
-              <button
-                key={option.type}
-                onClick={() => !isComingSoon(option.type) && setSelectedType(option.type)}
-                disabled={isComingSoon(option.type)}
-                className={`p-4 rounded-lg border-2 text-left transition-all ${
-                  selectedType === option.type
-                    ? 'border-blue-500 bg-blue-50'
-                    : isComingSoon(option.type)
-                    ? 'border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed'
-                    : 'border-gray-300 hover:border-gray-400'
-                }`}
-              >
-                <div className="text-3xl mb-2">{option.icon}</div>
-                <div className="font-semibold">{option.name}</div>
-                <div className="text-xs text-gray-500 mt-1">{option.description}</div>
-              </button>
-            ))}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+      <div className="bg-white dark:bg-gray-900 rounded-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-800">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-800">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Choose Background</h2>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mt-1">
+              Select an animated background for your portfolio ({backgrounds.length} available)
+            </p>
           </div>
-        </div>
-
-        {/* Settings (only show if not 'none') */}
-        {selectedType !== 'none' && (
-          <>
-            {/* Color Picker */}
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Color
-              </label>
-              <div className="flex gap-3 items-center">
-                <input
-                  type="color"
-                  value={color}
-                  onChange={(e) => setColor(e.target.value)}
-                  className="w-16 h-10 rounded border cursor-pointer"
-                />
-                <input
-                  type="text"
-                  value={color}
-                  onChange={(e) => setColor(e.target.value)}
-                  placeholder="#3b82f6"
-                  className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-
-            {/* Speed Slider */}
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Speed: {speed}
-              </label>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={speed}
-                onChange={(e) => setSpeed(Number(e.target.value))}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-gray-500 mt-1">
-                <span>Slow</span>
-                <span>Fast</span>
-              </div>
-            </div>
-
-            {/* Density Slider */}
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Density: {density}
-              </label>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={density}
-                onChange={(e) => setDensity(Number(e.target.value))}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs text-gray-500 mt-1">
-                <span>Low</span>
-                <span>High</span>
-              </div>
-            </div>
-
-            {/* Interactive Toggle */}
-            <div className="flex items-center gap-3 p-4 border rounded-lg">
-              <input
-                type="checkbox"
-                id="interactive"
-                checked={interactive}
-                onChange={(e) => setInteractive(e.target.checked)}
-                className="w-4 h-4"
-              />
-              <div className="flex-1">
-                <p className="font-medium">
-                  Interactive
-                </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Particles react to mouse movement
-                </p>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* Preview Note */}
-        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-sm text-blue-900">
-            💡 <strong>Tip:</strong> Changes will apply immediately. Open the preview page in another tab to see the effect!
-          </p>
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-3 justify-end pt-4 border-t">
           <button
             onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
           >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            Apply Background
+            <X className="w-6 h-6 text-gray-600 dark:text-gray-400" />
           </button>
         </div>
+
+        {/* Grid */}
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {backgrounds.map((bg) => {
+              const BackgroundComponent = bg.component;
+              const isSelected = selectedId === bg.id;
+              const isHovered = hoveredId === bg.id;
+
+              return (
+                <button
+                  key={bg.id}
+                  onClick={() => handleSelect(bg.id)}
+                  onMouseEnter={() => setHoveredId(bg.id)}
+                  onMouseLeave={() => setHoveredId(null)}
+                  className={`relative group rounded-xl overflow-hidden aspect-video transition-all duration-300 ${
+                    isSelected
+                      ? 'ring-4 ring-blue-500 scale-105'
+                      : 'ring-2 ring-gray-300 dark:ring-gray-700 hover:ring-gray-400 dark:hover:ring-gray-600 hover:scale-105'
+                  }`}
+                >
+                  {/* Preview */}
+                  <div className="absolute inset-0 w-full h-full bg-black">
+                    <div className="w-full h-full scale-150 origin-center">
+                      <BackgroundComponent />
+                    </div>
+                  </div>
+
+                  {/* Overlay */}
+                  <div
+                    className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent transition-opacity duration-300 ${
+                      isHovered || isSelected ? 'opacity-100' : 'opacity-70'
+                    }`}
+                  />
+
+                  {/* Label */}
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <p className="text-white font-semibold text-sm truncate">
+                      {bg.name}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-gray-300 bg-white/10 px-2 py-0.5 rounded">
+                        {bg.category}
+                      </span>
+                      {isSelected && (
+                        <span className="text-blue-400 text-xs">Active</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Selected Badge */}
+                  {isSelected && (
+                    <div className="absolute top-2 right-2 bg-blue-500 rounded-full p-1">
+                      <svg
+                        className="w-4 h-4 text-white"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
-    </Modal>
+    </div>
   );
 }

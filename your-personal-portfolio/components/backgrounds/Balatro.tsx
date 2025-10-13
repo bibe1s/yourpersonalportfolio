@@ -130,7 +130,7 @@ export default function Balatro({
   spinAmount = 0.25,
   pixelFilter = 745.0,
   spinEase = 1.0,
-  isRotate = false,
+  isRotate = true,
   mouseInteraction = true
 }: BalatroProps) {
   const containerRef = useRef<HTMLDivElement>(null);

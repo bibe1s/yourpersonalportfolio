@@ -64,7 +64,7 @@ export default function LiquidEther({
   dt = 0.014,
   BFECC = true,
   resolution = 0.5,
-  isBounce = false,
+  isBounce = true,
   colors = defaultColors,
   style = {},
   className = '',

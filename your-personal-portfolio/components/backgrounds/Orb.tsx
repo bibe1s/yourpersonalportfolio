@@ -10,7 +10,7 @@ interface OrbProps {
 
 export default function Orb({
   hue = 0,
-  hoverIntensity = 0.2,
+  hoverIntensity = 1,
   rotateOnHover = true,
   forceHoverState = false
 }: OrbProps) {
