@@ -246,35 +246,37 @@ export function HolographicProfileCard({ personal }: HolographicProfileCardProps
         .gradient-glow-wrapper::before {
           content: '';
           position: absolute;
-          inset: -30px;
-          border-radius: 36px;
-          background: conic-gradient(
-            from 0deg,
-            #c137ff 0%,
-            #07c6ff 25%,
-            #00ffaa 50%,
-            #07c6ff 75%,
-            #c137ff 100%
+          inset: -15px;
+          border-radius: 40px;
+          background: linear-gradient(
+            135deg,
+            rgba(0, 255, 136, 0.8) 0%,
+            rgba(0, 229, 255, 0.8) 25%,
+            rgba(138, 43, 226, 0.8) 50%,
+            rgba(255, 105, 180, 0.8) 75%,
+            rgba(0, 255, 136, 0.8) 100%
           );
-          filter: blur(40px);
-          opacity: 0.8;
+          filter: blur(30px);
+          opacity: 0;
           z-index: 0;
-          animation: rotate-gradient 4s linear infinite;
+          animation: glow-pulse 3s ease-in-out infinite;
         }
 
         .gradient-glow-wrapper.static::before {
-          background: linear-gradient(145deg, #60496e, #71C4FF);
-          filter: blur(30px);
-          opacity: 0.5;
+          background: linear-gradient(145deg, rgba(139, 92, 246, 0.4), rgba(59, 130, 246, 0.4));
+          filter: blur(25px);
+          opacity: 0.3;
           animation: none;
         }
 
-        @keyframes rotate-gradient {
-          0% {
-            transform: rotate(0deg);
+        @keyframes glow-pulse {
+          0%, 100% {
+            opacity: 0.7;
+            filter: blur(30px);
           }
-          100% {
-            transform: rotate(360deg);
+          50% {
+            opacity: 1;
+            filter: blur(35px);
           }
         }
 
