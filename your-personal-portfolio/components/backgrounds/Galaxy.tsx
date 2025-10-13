@@ -191,19 +191,19 @@ interface GalaxyProps {
 export default function Galaxy({
   focal = [0.5, 0.5],
   rotation = [1.0, 0.0],
-  starSpeed = 0.5,
+  starSpeed = 3,
   density = 1,
   hueShift = 140,
   disableAnimation = false,
   speed = 1.0,
-  mouseInteraction = true,
+  mouseInteraction = false,
   glowIntensity = 0.3,
   saturation = 0.0,
   mouseRepulsion = true,
   repulsionStrength = 2,
   twinkleIntensity = 0.3,
   rotationSpeed = 0.1,
-  autoCenterRepulsion = 0,
+  autoCenterRepulsion = 10,
   transparent = true,
   ...rest
 }: GalaxyProps) {

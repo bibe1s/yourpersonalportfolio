@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Profile, ProfileMode } from '@/lib/types';
 import { defaultProfile } from '@/lib/defaultProfile';
-import { ProfileCard } from '@/components/profile/ProfileCard';
+import { HolographicProfileCard } from '@/components/profile/HolographicProfileCard';
 import { SocialLinks } from '@/components/profile/SocialLinks';
 import { ContentBlock } from '@/components/profile/ContentBlock';
 import { TechStackSection } from '@/components/profile/TechStackSection';
@@ -97,8 +97,8 @@ export default function PreviewPage() {
 
         {/* Main Content */}
         <div className="max-w-4xl mx-auto py-8">
-          {/* Profile Card */}
-          <ProfileCard personal={profile[currentMode].personal} />
+          {/* Profile Card - NOW WITH HOLOGRAPHIC EFFECT */}
+          <HolographicProfileCard personal={profile[currentMode].personal} />
 
           {/* Social Links */}
           <SocialLinks links={profile[currentMode].socialLinks} />

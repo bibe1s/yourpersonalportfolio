@@ -1,7 +1,7 @@
 "use client";
 
 import { useProfile } from '@/contexts/ProfileContext';
-import { ProfileCard } from '@/components/profile/ProfileCard';
+import { HolographicProfileCard } from '@/components/profile/HolographicProfileCard';
 import { EditorPanel } from '@/components/editor/EditorPanel';
 
 export default function EditorPage() {
@@ -23,7 +23,7 @@ export default function EditorPage() {
     <div className="flex h-screen">
       {/* Left Side - Live Profile Card Preview */}
       <div className="w-1/3 bg-black overflow-y-auto">
-        <ProfileCard personal={currentPersonal} />
+        <HolographicProfileCard personal={currentPersonal} />
       </div>
 
       {/* Right Side - Editor Panel */}

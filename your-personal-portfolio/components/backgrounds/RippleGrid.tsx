@@ -18,7 +18,7 @@ type Props = {
 
 const RippleGrid: React.FC<Props> = ({
   enableRainbow = false,
-  gridColor = '#ffffff',
+  gridColor = '#000000',
   rippleIntensity = 0.05,
   gridSize = 10.0,
   gridThickness = 15.0,

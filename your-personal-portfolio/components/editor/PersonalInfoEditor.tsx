@@ -38,7 +38,7 @@ export function PersonalInfoEditor() {
           <div className="flex-1">
             <input
               type="text"
-              value={personal.image}
+              value={personal.image || ''}
               onChange={(e) => updatePersonalInfo(currentMode, { image: e.target.value })}
               placeholder="Paste image URL"
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -109,18 +109,37 @@ export function PersonalInfoEditor() {
         />
       </div>
 
-      {/* 3D Effect Toggle */}
-      <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          id="image3D"
-          checked={personal.imageIs3D}
-          onChange={(e) => updatePersonalInfo(currentMode, { imageIs3D: e.target.checked })}
-          className="w-4 h-4"
-        />
-        <label htmlFor="image3D" className="text-sm">
-          Enable 3D image effect (hover animation)
+      {/* 3D Effect Toggles */}
+      <div className="border-t pt-4 space-y-3">
+        <p className="text-sm font-medium text-gray-700">Visual Effects</p>
+        
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={personal.enable3D || false}
+            onChange={(e) => updatePersonalInfo(currentMode, { enable3D: e.target.checked })}
+            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span className="text-sm text-gray-700">
+            Enable 3D image effect (hover animation)
+          </span>
         </label>
+
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={personal.enableGradient || false}
+            onChange={(e) => updatePersonalInfo(currentMode, { enableGradient: e.target.checked })}
+            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+          />
+          <span className="text-sm text-gray-700">
+            Enable gradient border animation
+          </span>
+        </label>
+
+        <p className="text-xs text-gray-500 mt-2">
+          💡 Enable 3D effect for interactive hover animations. Gradient adds an animated rainbow border.
+        </p>
       </div>
     </div>
   );
