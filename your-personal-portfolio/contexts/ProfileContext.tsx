@@ -56,7 +56,7 @@ updatePersonalInfo: (mode: ProfileMode, updates: Partial<PersonalInfo>) => void;
   deleteTechStack: (mode: ProfileMode, sectionId: string, techId: string) => void;
   
   // Background
-  updateBackground: (config: Partial<BackgroundConfig>) => void;
+  updateBackground: (mode: ProfileMode, config: Partial<BackgroundConfig>) => void;
   
   // Save/Cancel system
   saveChanges: () => void;

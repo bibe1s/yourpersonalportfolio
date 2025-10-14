@@ -64,9 +64,10 @@ export interface PersonalInfo {
   phone: string;                 // "+63 123-456-7890"
   image: string;                 // URL to profile image
   imageIs3D: boolean;            // Enable/disable 3D effect
-
+  
   enable3D?: boolean;        // Toggle for 3D tilt effect
   enableGradient?: boolean;  // Toggle for animated gradient border
+  borderStyle?: 'none' | 'gradient' | 'star' | 'electric' | 'pixel' | 'blur'; // Border style
 }
 
 // ============================================

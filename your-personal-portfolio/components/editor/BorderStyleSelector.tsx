@@ -1,105 +1,86 @@
-import React from 'react';
-import { Sparkles, Zap, Grid3x3, Waves, Palette } from 'lucide-react';
+// components/editor/BorderStyleSelector.tsx
 
-export type BorderStyle = 'none' | 'gradient' | 'star' | 'electric' | 'pixel' | 'blur';
+"use client";
 
-interface BorderStyleOption {
-  value: BorderStyle;
-  label: string;
-  description: string;
-  icon: React.ReactNode;
-}
-
-const borderOptions: BorderStyleOption[] = [
-  {
-    value: 'gradient',
-    label: 'Gradient Chase',
-    description: 'Rainbow light racing around',
-    icon: <Palette className="w-4 h-4" />,
-  },
-  {
-    value: 'star',
-    label: 'Star Border',
-    description: 'Light particles racing',
-    icon: <Sparkles className="w-4 h-4" />,
-  },
-  {
-    value: 'electric',
-    label: 'Electric',
-    description: 'Pulsing electric glow',
-    icon: <Zap className="w-4 h-4" />,
-  },
-  {
-    value: 'pixel',
-    label: 'Pixel Glitch',
-    description: 'Glitchy pixel shift',
-    icon: <Grid3x3 className="w-4 h-4" />,
-  },
-  {
-    value: 'blur',
-    label: 'Soft Blur',
-    description: 'Gentle pulsing blur',
-    icon: <Waves className="w-4 h-4" />,
-  },
-  {
-    value: 'none',
-    label: 'Static Glow',
-    description: 'Subtle static effect',
-    icon: <div className="w-4 h-4 rounded-full bg-purple-500/30" />,
-  },
-];
+import { useState } from 'react';
 
 interface BorderStyleSelectorProps {
-  value: BorderStyle;
-  onChange: (style: BorderStyle) => void;
+  value: string;
+  onChange: (style: 'gradient' | 'star' | 'electric' | 'pixel' | 'blur' | 'none') => void;
 }
 
-export const BorderStyleSelector: React.FC<BorderStyleSelectorProps> = ({
-  value,
-  onChange,
-}) => {
+export function BorderStyleSelector({ value, onChange }: BorderStyleSelectorProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const borderStyles = [
+    { id: 'gradient', name: 'Gradient', icon: '🌈', desc: 'Rainbow gradient with pulse' },
+    { id: 'star', name: 'Star', icon: '✨', desc: 'Light spots at corners' },
+    { id: 'electric', name: 'Electric', icon: '⚡', desc: 'Purple/pink glow' },
+    { id: 'pixel', name: 'Pixel', icon: '▪️', desc: 'RGB colored corners' },
+    { id: 'blur', name: 'Blur', icon: '💫', desc: 'Soft white blur' },
+    { id: 'none', name: 'None', icon: '○', desc: 'Subtle static glow' }
+  ];
+
+  const currentStyle = borderStyles.find(s => s.id === value) || borderStyles[0];
+
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        Border Animation Style
+      <label className="block text-sm font-medium text-gray-700">
+        Border Style
       </label>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value as BorderStyle)}
-        className="w-full px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
-      >
-        {borderOptions.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label} - {option.description}
-          </option>
-        ))}
-      </select>
       
-      {/* Visual Preview Grid */}
-      <div className="grid grid-cols-3 gap-2 mt-3">
-        {borderOptions.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            onClick={() => onChange(option.value)}
-            className={`
-              relative p-3 rounded-lg border-2 transition-all
-              ${
-                value === option.value
-                  ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700'
-              }
-            `}
-          >
-            <div className="flex flex-col items-center gap-1">
-              <div className="text-purple-500">{option.icon}</div>
-              <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                {option.label}
-              </span>
-            </div>
-          </button>
-        ))}
-      </div>
+      {/* Selected Style Display */}
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between px-4 py-3 bg-white border border-gray-300 rounded-lg hover:border-blue-500 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">{currentStyle.icon}</span>
+          <div className="text-left">
+            <div className="font-medium text-gray-900">{currentStyle.name}</div>
+            <div className="text-xs text-gray-500">{currentStyle.desc}</div>
+          </div>
+        </div>
+        <svg 
+          className={`w-5 h-5 transition-transform text-gray-400 ${isOpen ? 'rotate-180' : ''}`}
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Dropdown Options */}
+      {isOpen && (
+        <div className="absolute z-10 w-full max-w-md mt-2 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">
+          {borderStyles.map((style) => (
+            <button
+              key={style.id}
+              type="button"
+              onClick={() => {
+                onChange(style.id as any);
+                setIsOpen(false);
+              }}
+              className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-blue-50 transition-colors ${
+                value === style.id ? 'bg-blue-100' : ''
+              }`}
+            >
+              <span className="text-2xl">{style.icon}</span>
+              <div className="flex-1">
+                <div className="font-medium text-gray-900">{style.name}</div>
+                <div className="text-xs text-gray-500">{style.desc}</div>
+              </div>
+              {value === style.id && (
+                <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
-};
+}

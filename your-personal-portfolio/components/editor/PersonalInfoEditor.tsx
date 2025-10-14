@@ -1,6 +1,7 @@
 "use client";
 
 import { useProfile } from '@/contexts/ProfileContext';
+import { BorderStyleSelector } from './BorderStyleSelector';
 import { Upload } from 'lucide-react';
 
 export function PersonalInfoEditor() {
@@ -133,9 +134,17 @@ export function PersonalInfoEditor() {
             className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
           <span className="text-sm text-gray-700">
-            Enable gradient border animation
+            Enable border animation
           </span>
         </label>
+
+        {/* NEW: Border Style Selector (only shows when gradient is enabled) */}
+          {personal.enableGradient && (
+            <BorderStyleSelector
+              value={personal.borderStyle || 'gradient'}
+              onChange={(style) => updatePersonalInfo(currentMode, { borderStyle: style })}
+            />
+          )}
 
         <p className="text-xs text-gray-500 mt-2">
           💡 Enable 3D effect for interactive hover animations. Gradient adds an animated rainbow border.

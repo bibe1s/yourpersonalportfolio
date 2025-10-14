@@ -3,11 +3,13 @@
 import { PersonalInfo } from '@/lib/types';
 import { Mail, Phone } from 'lucide-react';
 import { useEffect, useRef, useCallback, useMemo } from 'react';
+import { BorderWrapper } from '@/components/borders/BorderWrapper';
 
 interface HolographicProfileCardProps {
   personal: PersonalInfo & {
     enable3D?: boolean;
     enableGradient?: boolean;
+    borderStyle?: 'gradient' | 'star' | 'electric' | 'pixel' | 'blur' | 'none';
   };
 }
 
@@ -34,6 +36,7 @@ export function HolographicProfileCard({ personal }: HolographicProfileCardProps
   const cardRef = useRef<HTMLDivElement>(null);
   const enable3D = personal.enable3D ?? false;
   const enableGradient = personal.enableGradient ?? false;
+  const borderStyle = personal.borderStyle || 'gradient';
 
   const animationHandlers = useMemo(() => {
     if (!enable3D) return null;
@@ -182,6 +185,12 @@ export function HolographicProfileCard({ personal }: HolographicProfileCardProps
     };
   }, [enable3D, animationHandlers, handlePointerMove, handlePointerEnter, handlePointerLeave]);
 
+  // Get the border class based on enabled state and style
+  const getBorderClass = () => {
+    if (!enableGradient) return 'static';
+    return borderStyle;
+  };
+
   return (
     <div className="flex flex-col items-center p-8 text-white">
       <style jsx>{`
@@ -239,11 +248,13 @@ export function HolographicProfileCard({ personal }: HolographicProfileCardProps
             rotateY(var(--rotate-x, 0deg));
         }
 
+        /* Border Style Base */
         .gradient-glow-wrapper {
           position: relative;
         }
 
-        .gradient-glow-wrapper::before {
+        /* Gradient Border - Rainbow STATIC (no animation) */
+        .gradient-glow-wrapper.gradient::before {
           content: '';
           position: absolute;
           inset: -15px;
@@ -257,27 +268,126 @@ export function HolographicProfileCard({ personal }: HolographicProfileCardProps
             rgba(0, 255, 136, 0.8) 100%
           );
           filter: blur(30px);
-          opacity: 0;
+          opacity: 0.7;
           z-index: 0;
-          animation: glow-pulse 3s ease-in-out infinite;
         }
 
-        .gradient-glow-wrapper.static::before {
+        /* Star Border - Light particles racing */
+        .gradient-glow-wrapper.star::before,
+        .gradient-glow-wrapper.star::after {
+          content: '';
+          position: absolute;
+          width: 300%;
+          height: 50%;
+          opacity: 0.7;
+          border-radius: 50%;
+          z-index: 0;
+          background: radial-gradient(circle, rgba(255, 255, 255, 0.9), transparent 10%);
+        }
+
+        .gradient-glow-wrapper.star::before {
+          bottom: -11px;
+          right: -250%;
+          animation: star-movement-bottom 6s linear infinite alternate;
+        }
+
+        .gradient-glow-wrapper.star::after {
+          top: -10px;
+          left: -250%;
+          animation: star-movement-top 6s linear infinite alternate;
+        }
+
+        /* Electric Border - Pulsing electric effect */
+        .gradient-glow-wrapper.electric::before {
+          content: '';
+          position: absolute;
+          inset: -15px;
+          border-radius: 40px;
+          background: linear-gradient(45deg, 
+            rgba(82, 39, 255, 0.7), 
+            rgba(255, 39, 163, 0.7), 
+            rgba(82, 39, 255, 0.7)
+          );
+          filter: blur(25px);
+          opacity: 0.8;
+          z-index: 0;
+          animation: electric-pulse 0.3s ease-in-out infinite;
+        }
+
+        /* Pixel Border - Glitchy pixel shift */
+        .gradient-glow-wrapper.pixel::before {
+          content: '';
+          position: absolute;
+          inset: -18px;
+          border-radius: 40px;
+          background: 
+            radial-gradient(circle at 0% 0%, rgba(0, 255, 0, 0.6) 0%, transparent 40%),
+            radial-gradient(circle at 100% 0%, rgba(0, 255, 255, 0.6) 0%, transparent 40%),
+            radial-gradient(circle at 100% 100%, rgba(255, 0, 255, 0.6) 0%, transparent 40%),
+            radial-gradient(circle at 0% 100%, rgba(255, 255, 0, 0.6) 0%, transparent 40%);
+          filter: blur(20px);
+          opacity: 0.7;
+          z-index: 0;
+          animation: pixel-shift 0.5s steps(4) infinite;
+        }
+
+        /* Blur Border - Pulsing white glow */
+        .gradient-glow-wrapper.blur::before {
+          content: '';
+          position: absolute;
+          inset: -25px;
+          border-radius: 40px;
+          background: radial-gradient(
+            circle at 50% 50%, 
+            rgba(255, 255, 255, 0.7) 0%, 
+            transparent 70%
+          );
+          filter: blur(45px);
+          opacity: 0.6;
+          z-index: 0;
+          animation: blur-pulse 2s ease-in-out infinite;
+        }
+
+        /* None/Static - Subtle purple-blue glow */
+        .gradient-glow-wrapper.static::before,
+        .gradient-glow-wrapper.none::before {
+          content: '';
+          position: absolute;
+          inset: -15px;
+          border-radius: 40px;
           background: linear-gradient(145deg, rgba(139, 92, 246, 0.4), rgba(59, 130, 246, 0.4));
           filter: blur(25px);
           opacity: 0.3;
-          animation: none;
+          z-index: 0;
         }
 
-        @keyframes glow-pulse {
-          0%, 100% {
-            opacity: 0.7;
-            filter: blur(30px);
-          }
-          50% {
-            opacity: 1;
-            filter: blur(35px);
-          }
+        /* Animations */
+        @keyframes star-movement-bottom {
+          0% { transform: translate(0%, 0%); opacity: 1; }
+          100% { transform: translate(-100%, 0%); opacity: 0; }
+        }
+
+        @keyframes star-movement-top {
+          0% { transform: translate(0%, 0%); opacity: 1; }
+          100% { transform: translate(100%, 0%); opacity: 0; }
+        }
+
+        @keyframes electric-pulse {
+          0%, 100% { opacity: 0.8; filter: blur(25px); }
+          50% { opacity: 1; filter: blur(30px); }
+        }
+
+        @keyframes pixel-shift {
+          0% { transform: translate(0, 0); }
+          25% { transform: translate(2px, 0); }
+          50% { transform: translate(0, 2px); }
+          75% { transform: translate(-2px, 0); }
+          100% { transform: translate(0, -2px); }
+        }
+
+        @keyframes blur-pulse {
+          0%, 100% { opacity: 0.6; filter: blur(45px); }
+          50% { opacity: 0.8; filter: blur(50px); }
         }
 
         .holo-shine {
@@ -303,7 +413,7 @@ export function HolographicProfileCard({ personal }: HolographicProfileCardProps
       `}</style>
 
       {/* Gradient Glow Backdrop Wrapper */}
-      <div className={`gradient-glow-wrapper ${enableGradient ? '' : 'static'}`}>
+      <div className={`gradient-glow-wrapper ${getBorderClass()}`}>
         {/* Profile Image Card */}
         <div
           ref={wrapRef}
@@ -352,17 +462,11 @@ export function HolographicProfileCard({ personal }: HolographicProfileCardProps
 
       {/* Text Content Below Card */}
       <div className="text-center space-y-4 mt-4">
-        {/* Title */}
         <p className="text-sm text-gray-400 uppercase tracking-wider">
           {personal.title}
         </p>
-
-        {/* Name */}
         <h1 className="text-3xl font-bold">{personal.name}</h1>
-
-        {/* Contact Info */}
         <div className="space-y-2 pt-2">
-          {/* Email */}
           <div className="flex items-center justify-center gap-2 text-gray-300">
             <Mail className="w-4 h-4 flex-shrink-0" />
             <a
@@ -372,8 +476,6 @@ export function HolographicProfileCard({ personal }: HolographicProfileCardProps
               {personal.email}
             </a>
           </div>
-
-          {/* Phone */}
           <div className="flex items-center justify-center gap-2 text-gray-300">
             <Phone className="w-4 h-4 flex-shrink-0" />
             <a

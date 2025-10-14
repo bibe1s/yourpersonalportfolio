@@ -22,7 +22,7 @@ export default function EditorPage() {
   return (
     <div className="flex h-screen">
       {/* Left Side - Live Profile Card Preview */}
-      <div className="w-1/3 bg-black overflow-y-auto">
+      <div className="flex w-1/3 bg-black overflow-y-auto items-center justify-center">
         <HolographicProfileCard personal={currentPersonal} />
       </div>
 
