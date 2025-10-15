@@ -114,6 +114,7 @@ const handleCloseEditBlock = () => {
           <button
             {...attributes}
             {...listeners}
+            suppressHydrationWarning
             className="cursor-grab active:cursor-grabbing p-2 hover:bg-gray-100 rounded"
           >
             <GripVertical className="w-5 h-5 text-gray-400" />
@@ -172,13 +173,13 @@ const handleCloseEditBlock = () => {
                           </p>
                         )}
                       </div>
-                      {/* <button
+                      <button
                         onClick={() => deleteContentBlock(mode, section.id, block.id)}
                         className="p-1 text-red-600 hover:bg-red-50 rounded"
                         title="Delete block"
                       >
                         <X className="w-4 h-4" />
-                      </button> */}
+                      </button>
                     </div>
                   </div>
                 ))

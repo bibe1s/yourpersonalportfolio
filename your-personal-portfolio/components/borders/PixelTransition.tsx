@@ -1,3 +1,5 @@
+// PixelTransition.tsx
+
 import React, { useRef, useEffect, useState, CSSProperties } from 'react';
 import { gsap } from 'gsap';
 

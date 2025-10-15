@@ -196,14 +196,14 @@ export default function Galaxy({
   hueShift = 140,
   disableAnimation = false,
   speed = 1.0,
-  mouseInteraction = false,
+  mouseInteraction = true,
   glowIntensity = 0.3,
   saturation = 0.0,
   mouseRepulsion = true,
-  repulsionStrength = 2,
+  repulsionStrength = 5,
   twinkleIntensity = 0.3,
   rotationSpeed = 0.1,
-  autoCenterRepulsion = 10,
+  autoCenterRepulsion = 0,
   transparent = true,
   ...rest
 }: GalaxyProps) {

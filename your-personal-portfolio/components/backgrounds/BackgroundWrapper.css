@@ -1,0 +1,10 @@
+/* Ensure interactive elements in content layer can receive pointer events */
+.content-wrapper a,
+.content-wrapper button,
+.content-wrapper input,
+.content-wrapper select,
+.content-wrapper textarea,
+.content-wrapper [role="button"],
+.content-wrapper [tabindex] {
+  pointer-events: auto;
+}

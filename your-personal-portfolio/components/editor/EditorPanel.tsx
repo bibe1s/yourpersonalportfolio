@@ -1,3 +1,5 @@
+// components/editor/EditorPanel.tsx
+
 "use client";
 
 import { useState } from 'react'; // ← MISSING THIS

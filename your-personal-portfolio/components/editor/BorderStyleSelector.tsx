@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface BorderStyleSelectorProps {
   value: string;
@@ -11,6 +11,7 @@ interface BorderStyleSelectorProps {
 
 export function BorderStyleSelector({ value, onChange }: BorderStyleSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const borderStyles = [
     { id: 'gradient', name: 'Gradient', icon: '🌈', desc: 'Rainbow gradient with pulse' },
@@ -23,8 +24,25 @@ export function BorderStyleSelector({ value, onChange }: BorderStyleSelectorProp
 
   const currentStyle = borderStyles.find(s => s.id === value) || borderStyles[0];
 
+  // Handle clicks outside the dropdown to close it
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
   return (
-    <div className="space-y-2">
+    <div ref={dropdownRef} className="space-y-2 relative"> {/* Added relative for better absolute positioning */}
       <label className="block text-sm font-medium text-gray-700">
         Border Style
       </label>
