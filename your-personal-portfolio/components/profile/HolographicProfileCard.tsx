@@ -1,4 +1,4 @@
-// components/profile/HolographicProfileCard.tsx
+// app/components/profile/HolographicProfileCard.tsx
 
 "use client";
 

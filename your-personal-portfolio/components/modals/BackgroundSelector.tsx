@@ -1,3 +1,5 @@
+// app/components/modals/BackgroundSelector.tsx
+
 import { X, Check } from 'lucide-react';
 
 interface BackgroundOption {

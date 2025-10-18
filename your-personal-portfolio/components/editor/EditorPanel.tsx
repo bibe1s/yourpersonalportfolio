@@ -12,10 +12,13 @@ import { BackgroundSelector } from '@/components/modals/BackgroundSelector';
 import { SaveCancelBar } from './SaveCancelBar';
 import { LogoutButton } from './LogoutButton';
 import { Palette, ExternalLink } from 'lucide-react';
+import { LayoutSelector } from '@/components/modals/LayoutSelector';
+import { Layout } from 'lucide-react';
 
 export function EditorPanel() {
-  const { profile, currentMode, updateBackground } = useProfile();
+  const { profile, currentMode, updateBackground, updateLayoutType } = useProfile();
   const [showBackgroundModal, setShowBackgroundModal] = useState(false);
+  const [showLayoutModal, setShowLayoutModal] = useState(false);
 
   const handleSaveBackground = (
     type: any,
@@ -33,6 +36,10 @@ export function EditorPanel() {
     });
   };
 
+  const handleSelectLayout = (layoutType: any) => {
+  updateLayoutType(currentMode, layoutType);
+  };
+
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
@@ -46,6 +53,13 @@ export function EditorPanel() {
           >
             <ExternalLink className="w-4 h-4" />
             Open Preview
+          </button>
+
+          <button
+            onClick={() => setShowLayoutModal(true)}
+            className="p-2 hover:bg-gray-100 rounded-lg"
+            title="Change Layout">
+            <Layout className="w-5 h-5 text-gray-600" />
           </button>
           
           <button
@@ -88,7 +102,16 @@ export function EditorPanel() {
         onClose={() => setShowBackgroundModal(false)}
         onSave={handleSaveBackground}
         currentConfig={profile[currentMode].background}
-      />    
+      />
+
+      {/* Layout Selector Modal - ADD THIS */}
+      <LayoutSelector
+        isOpen={showLayoutModal}
+        onClose={() => setShowLayoutModal(false)}
+        onSelect={handleSelectLayout}
+        currentLayout={profile[currentMode].layoutType}
+      />
+
     </div>
   );
 }

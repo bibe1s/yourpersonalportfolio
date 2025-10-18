@@ -4,6 +4,8 @@
 export type ContentBlockType = 'title' | 'context';
 export type ProfileMode = 'web2' | 'web3';
 
+export type LayoutType = 'default' | 'left-side' | 'right-side';
+
 // Define all supported background types, expanded to match BackgroundSelector.tsx
 export type BackgroundType = 
   | 'none'
@@ -128,12 +130,14 @@ export interface Profile {
     socialLinks: SocialLink[];   // Web2 social links
     sections: ProfileSection[];  // Web2 content sections
     background: BackgroundConfig; // Web2 background config
+    layoutType: LayoutType;         // Web2 layout type
   };
   web3: {
     personal: PersonalInfo;      // Web3 personal info
     socialLinks: SocialLink[];   // Web3 social links
     sections: ProfileSection[];  // Web3 content sections
     background: BackgroundConfig; // Web3 background config
+    layoutType: LayoutType;         // Web3 layout type
   };
   theme: {
     accentColor: string;         // Main color for buttons, etc.

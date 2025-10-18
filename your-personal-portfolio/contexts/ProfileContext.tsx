@@ -12,7 +12,8 @@ import {
   BackgroundConfig,
   PersonalInfo,
   ProfileDisplaySettings,
-  ProfileMode
+  ProfileMode,
+  LayoutType
 } from '@/lib/types';
 import { defaultProfile, generateId } from '@/lib/defaultProfile';
 
@@ -59,6 +60,9 @@ updatePersonalInfo: (mode: ProfileMode, updates: Partial<PersonalInfo>) => void;
   
   // Background
   updateBackground: (mode: ProfileMode, config: Partial<BackgroundConfig>) => void;
+
+  // Layout Type 
+  updateLayoutType: (mode: ProfileMode, layoutType: LayoutType) => void;
   
   // Save/Cancel system
   saveChanges: () => void;
@@ -549,6 +553,27 @@ const updateBackground = (mode: ProfileMode, config: Partial<BackgroundConfig>) 
     return newProfile;
   });
 };
+
+// ============================================
+// LAYOUT TYPE
+// ============================================
+
+const updateLayoutType = (mode: ProfileMode, layoutType: LayoutType) => {
+  console.log('🎨 Updating layout type:', { mode, layoutType });
+  
+  setProfile(prev => {
+    const newProfile = {
+      ...prev,
+      [mode]: {
+        ...prev[mode],
+        layoutType,
+      },
+    };
+    
+    console.log('✅ New layout type:', newProfile[mode].layoutType);
+    return newProfile;
+  });
+};
   
   // ============================================
   // SAVE / CANCEL
@@ -621,6 +646,7 @@ const discardChanges = () => {
     updateTechStack,
     deleteTechStack,
     updateBackground,
+    updateLayoutType,
     saveChanges,
     discardChanges,
     exportProfile,

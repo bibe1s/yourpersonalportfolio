@@ -1,3 +1,5 @@
+// app/components/profile/SocialLinks.tsx
+
 "use client";
 
 import { SocialLink as SocialLinkType } from '@/lib/types';

@@ -93,6 +93,7 @@ export const defaultProfile: Profile = {
       density: 50,
       interactive: false,
     },
+    layoutType: 'default',
   },
   
   // Web3 Content (Your Persona)
@@ -150,6 +151,7 @@ export const defaultProfile: Profile = {
       density: 50,
       interactive: false,
     },
+    layoutType: 'default',
   },
   
   // Theme Settings (just colors, no background here anymore)
@@ -185,6 +187,7 @@ export function createEmptyProfile(): Profile {
         density: 50,
         interactive: false,
       },
+      layoutType: 'default',
     },
     web3: {
       personal: {
@@ -204,6 +207,7 @@ export function createEmptyProfile(): Profile {
         density: 50,
         interactive: false,
       },
+      layoutType: 'default',
     },
   };
 }

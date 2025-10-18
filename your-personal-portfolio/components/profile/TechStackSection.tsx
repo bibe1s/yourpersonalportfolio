@@ -1,3 +1,5 @@
+// app/components/profile/TechStackSection.tsx
+
 "use client";
 
 import { TechStackItem } from '@/lib/types';

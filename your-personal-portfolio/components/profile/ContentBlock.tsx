@@ -1,3 +1,5 @@
+// app/components/profile/ContentBlock.tsx
+
 "use client";
 
 import { ContentBlock as ContentBlockType } from '@/lib/types';
