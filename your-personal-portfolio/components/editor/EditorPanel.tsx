@@ -1,9 +1,8 @@
 // components/editor/EditorPanel.tsx
-
 "use client";
 
-import { useState } from 'react'; // ← MISSING THIS
-import { useProfile } from '@/contexts/ProfileContext'; // ← MISSING THIS
+import { useState } from 'react';
+import { useProfile } from '@/contexts/ProfileContext';
 import { ModeToggle } from './ModeToggle';
 import { PersonalInfoEditor } from './PersonalInfoEditor';
 import { SocialLinksEditor } from './SocialLinksEditor';
@@ -11,6 +10,7 @@ import { ProfileDisplaySettings } from './ProfileDisplaySettings';
 import { DraggableSectionsList } from './DraggableSectionsList';
 import { BackgroundSelector } from '@/components/modals/BackgroundSelector';
 import { SaveCancelBar } from './SaveCancelBar';
+import { LogoutButton } from './LogoutButton';
 import { Palette, ExternalLink } from 'lucide-react';
 
 export function EditorPanel() {
@@ -41,7 +41,7 @@ export function EditorPanel() {
         
         <div className="flex gap-2">
           <button
-            onClick={() => window.open('/preview', '_blank')}
+            onClick={() => window.open('/', '_blank')}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
           >
             <ExternalLink className="w-4 h-4" />
@@ -49,12 +49,15 @@ export function EditorPanel() {
           </button>
           
           <button
-            onClick={() => setShowBackgroundModal(true)} // ← FIX THIS (was setBackgroundModalOpen)
+            onClick={() => setShowBackgroundModal(true)}
             className="p-2 hover:bg-gray-100 rounded-lg"
             title="Change Background"
           >
             <Palette className="w-5 h-5 text-gray-600" />
           </button>
+
+          {/* Logout Button */}
+          <LogoutButton />
         </div>
       </div>
 
@@ -81,7 +84,7 @@ export function EditorPanel() {
 
       {/* Background Selector Modal */}
       <BackgroundSelector
-        isOpen={showBackgroundModal}
+        isOpen={showBackgroundModal} 
         onClose={() => setShowBackgroundModal(false)}
         onSave={handleSaveBackground}
         currentConfig={profile[currentMode].background}

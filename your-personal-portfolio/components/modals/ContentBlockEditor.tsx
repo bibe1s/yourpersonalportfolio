@@ -3,16 +3,19 @@
 import { useState, useEffect } from 'react';
 import { Modal } from './Modal';
 import { ContentBlockType } from '@/lib/types';
+import { Link as LinkIcon } from 'lucide-react';
 
 interface ContentBlockEditorProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (type: ContentBlockType, content: string, duration?: string) => void;
-  onDelete?: () => void; // ← NEW: Optional delete function
-  initialData?: { // ← NEW: Initial data for editing
+  onSave: (type: ContentBlockType, content: string, duration?: string, image?: string, imageLink?: string) => void;
+  onDelete?: () => void; // Optional delete function
+  initialData?: { // Initial data for editing
     type: ContentBlockType;
     content: string;
     duration?: string;
+    image?: string;
+    imageLink?: string;
   };
 }
 
@@ -27,6 +30,11 @@ export function ContentBlockEditor({
   const [content, setContent] = useState('');
   const [hasDuration, setHasDuration] = useState(false);
   const [duration, setDuration] = useState('');
+  
+  // NEW: Image fields
+  const [hasImage, setHasImage] = useState(false);
+  const [image, setImage] = useState('');
+  const [imageLink, setImageLink] = useState('');
 
   // Load initial data when editing
   useEffect(() => {
@@ -35,12 +43,20 @@ export function ContentBlockEditor({
       setContent(initialData.content);
       setHasDuration(!!initialData.duration);
       setDuration(initialData.duration || '');
+      
+      // Load image data
+      setHasImage(!!initialData.image);
+      setImage(initialData.image || '');
+      setImageLink(initialData.imageLink || '');
     } else {
       // Reset when adding new
       setType('title');
       setContent('');
       setHasDuration(false);
       setDuration('');
+      setHasImage(false);
+      setImage('');
+      setImageLink('');
     }
   }, [initialData, isOpen]);
 
@@ -50,7 +66,9 @@ export function ContentBlockEditor({
     onSave(
       type,
       content,
-      hasDuration && duration.trim() ? duration : undefined
+      hasDuration && duration.trim() ? duration : undefined,
+      hasImage && image.trim() ? image : undefined,
+      hasImage && imageLink.trim() ? imageLink : undefined
     );
 
     handleClose();
@@ -63,6 +81,9 @@ export function ContentBlockEditor({
       setContent('');
       setHasDuration(false);
       setDuration('');
+      setHasImage(false);
+      setImage('');
+      setImageLink('');
     }
     onClose();
   };
@@ -140,24 +161,24 @@ export function ContentBlockEditor({
           </p>
         </div>
 
-{/* Duration Toggle */}
-<div className="flex items-start gap-3 p-4 border rounded-lg">
-  <input
-    type="checkbox"
-    id="hasDuration"
-    checked={hasDuration}
-    onChange={(e) => setHasDuration(e.target.checked)}
-    className="w-4 h-4 mt-1"
-  />
-  <div className="flex-1">
-    <p className="font-medium">
-      Add Duration
-    </p>
-    <p className="text-xs text-gray-500 mt-1">
-      Add a date or time period (e.g., "2023 - 2024", "Jan 2024")
-    </p>
-  </div>
-</div>
+        {/* Duration Toggle */}
+        <div className="flex items-start gap-3 p-4 border rounded-lg">
+          <input
+            type="checkbox"
+            id="hasDuration"
+            checked={hasDuration}
+            onChange={(e) => setHasDuration(e.target.checked)}
+            className="w-4 h-4 mt-1"
+          />
+          <div className="flex-1">
+            <p className="font-medium">
+              Add Duration
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              Add a date or time period (e.g., "2023 - 2024", "Jan 2024")
+            </p>
+          </div>
+        </div>
 
         {/* Duration Input (conditional) */}
         {hasDuration && (
@@ -172,6 +193,95 @@ export function ContentBlockEditor({
               placeholder="e.g., 2023 - 2024, Jan 2024, Present"
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          </div>
+        )}
+
+        {/* NEW: Photo Toggle */}
+        <div className="flex items-start gap-3 p-4 border rounded-lg">
+          <input
+            type="checkbox"
+            id="hasImage"
+            checked={hasImage}
+            onChange={(e) => setHasImage(e.target.checked)}
+            className="w-4 h-4 mt-1"
+          />
+          <div className="flex-1">
+            <p className="font-medium">
+              Add Photo
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              Add an image to this content block (landscape orientation recommended)
+            </p>
+          </div>
+        </div>
+
+        {/* NEW: Image Inputs (conditional) */}
+        {hasImage && (
+          <div className="ml-7 space-y-4">
+            {/* Image URL */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Image URL *
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={image}
+                  onChange={(e) => setImage(e.target.value)}
+                  placeholder="https://example.com/image.jpg"
+                  className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button
+                  onClick={() => {
+                    const url = prompt('Paste image URL:');
+                    if (url) setImage(url);
+                  }}
+                  className="px-3 py-2 border rounded-lg hover:bg-gray-50"
+                  title="Paste URL"
+                >
+                  <LinkIcon className="w-5 h-5" />
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                Direct link to the image (recommended: landscape orientation)
+              </p>
+            </div>
+
+            {/* Image Link (optional) */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Link URL (Optional)
+              </label>
+              <input
+                type="text"
+                value={imageLink}
+                onChange={(e) => setImageLink(e.target.value)}
+                placeholder="https://example.com (optional - makes image clickable)"
+                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                If provided, clicking the image will redirect to this URL
+              </p>
+            </div>
+
+            {/* Image Preview */}
+            {image && (
+              <div className="p-3 bg-gray-50 rounded-lg border">
+                <p className="text-xs text-gray-500 mb-2">Image Preview:</p>
+                <div className="w-full aspect-video bg-gray-200 rounded overflow-hidden">
+                  <img
+                    src={image}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = '';
+                      e.currentTarget.alt = 'Failed to load image';
+                      e.currentTarget.className = 'w-full h-full flex items-center justify-center text-red-500';
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -197,6 +307,24 @@ export function ContentBlockEditor({
               )}
             </p>
           )}
+          
+          {/* Show image in preview if added */}
+          {hasImage && image && (
+            <div className="mt-3">
+              <div className="w-full aspect-video bg-gray-200 rounded overflow-hidden">
+                <img
+                  src={image}
+                  alt="Content preview"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {imageLink && (
+                <p className="text-xs text-blue-600 mt-1">
+                  🔗 Clickable link: {imageLink}
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Actions */}
@@ -220,7 +348,7 @@ export function ContentBlockEditor({
             </button>
             <button
               onClick={handleSave}
-              disabled={!content.trim()}
+              disabled={!content.trim() || (hasImage && !image.trim())}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isEditing ? 'Update' : 'Add Block'}

@@ -1,6 +1,8 @@
+// app/layout.tsx
 import type { Metadata } from "next";
 import "./globals.css";
 import { ProfileProvider } from "@/contexts/ProfileContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 export const metadata: Metadata = {
   title: "Portfolio Builder",
@@ -15,9 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ProfileProvider>
-          {children}
-        </ProfileProvider>
+        <AuthProvider>
+          <ProfileProvider>
+            {children}
+          </ProfileProvider>
+        </AuthProvider>
       </body>
     </html>
   );

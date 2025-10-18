@@ -1,3 +1,5 @@
+//component/lib/defaultProfile.ts
+
 import { Profile } from './types';
 
 // ============================================

@@ -1,7 +1,9 @@
+// app/components/editor/DraggableSectionsList.tsx
+
 "use client";
 
 import { useProfile } from '@/contexts/ProfileContext';
-import { Plus, Trash2, X, GripVertical, Edit } from 'lucide-react';
+import { Plus, Trash2, X, GripVertical, Edit, Image as ImageIcon } from 'lucide-react';
 import { useState } from 'react';
 import { ContentBlockEditor } from '@/components/modals/ContentBlockEditor';
 import { TechStackEditor } from '@/components/modals/TechStackEditor';
@@ -55,8 +57,8 @@ function DraggableSection({ section, mode }: any) {
   const [showEditBlockModal, setShowEditBlockModal] = useState(false);
 
   const handleSaveSectionName = (name: string) => {
-  updateSection(mode, section.id, { name });
-};
+    updateSection(mode, section.id, { name });
+  };
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -64,38 +66,52 @@ function DraggableSection({ section, mode }: any) {
     opacity: isDragging ? 0.5 : 1,
   };
 
-  const handleSaveBlock = (type: ContentBlockType, content: string, duration?: string) => {
-  if (editingBlock) {
-    // Update existing block
-    updateContentBlock(mode, section.id, editingBlock.id, {
-      type,
-      content,
-      duration,
-    });
-  } else {
-    // Add new block
-    addContentBlock(mode, section.id, { type, content, duration });
-  }
-};
+  // ✅ UPDATED: Include image and imageLink parameters
+  const handleSaveBlock = (
+    type: ContentBlockType, 
+    content: string, 
+    duration?: string,
+    image?: string,
+    imageLink?: string
+  ) => {
+    if (editingBlock) {
+      // Update existing block
+      updateContentBlock(mode, section.id, editingBlock.id, {
+        type,
+        content,
+        duration,
+        image,
+        imageLink,
+      });
+    } else {
+      // Add new block
+      addContentBlock(mode, section.id, { 
+        type, 
+        content, 
+        duration,
+        image,
+        imageLink,
+      });
+    }
+  };
 
-const handleEditBlock = (block: any) => {
-  setEditingBlock(block);
-  setShowEditBlockModal(true);
-};
+  const handleEditBlock = (block: any) => {
+    setEditingBlock(block);
+    setShowEditBlockModal(true);
+  };
 
-const handleDeleteBlock = () => {
-  if (editingBlock) {
-    deleteContentBlock(mode, section.id, editingBlock.id);
+  const handleDeleteBlock = () => {
+    if (editingBlock) {
+      deleteContentBlock(mode, section.id, editingBlock.id);
+      setEditingBlock(null);
+      setShowEditBlockModal(false);
+    }
+  };
+
+  const handleCloseEditBlock = () => {
     setEditingBlock(null);
     setShowEditBlockModal(false);
-  }
-};
-
-const handleCloseEditBlock = () => {
-  setEditingBlock(null);
-  setShowEditBlockModal(false);
-};
-
+  };
 
   const handleSaveTech = (name: string, iconUrl: string) => {
     addTechStack(mode, section.id, { name, icon: iconUrl });
@@ -163,18 +179,36 @@ const handleCloseEditBlock = () => {
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <span className="text-xs font-medium text-gray-500 uppercase">
-                          {block.type}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-gray-500 uppercase">
+                            {block.type}
+                          </span>
+                          {/* ✅ NEW: Image indicator icon */}
+                          {block.image && (
+                            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <ImageIcon className="w-3 h-3" />
+                              Photo
+                            </span>
+                          )}
+                        </div>
                         <p className="text-sm mt-1">{block.content}</p>
                         {block.duration && (
                           <p className="text-xs text-gray-500 mt-1">
                             📅 {block.duration}
                           </p>
                         )}
+                        {/* ✅ NEW: Show image link if exists */}
+                        {block.imageLink && (
+                          <p className="text-xs text-blue-600 mt-1">
+                            🔗 Link: {block.imageLink.length > 40 ? block.imageLink.substring(0, 40) + '...' : block.imageLink}
+                          </p>
+                        )}
                       </div>
                       <button
-                        onClick={() => deleteContentBlock(mode, section.id, block.id)}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent opening edit modal
+                          deleteContentBlock(mode, section.id, block.id);
+                        }}
                         className="p-1 text-red-600 hover:bg-red-50 rounded"
                         title="Delete block"
                       >
@@ -261,12 +295,7 @@ const handleCloseEditBlock = () => {
         currentName={section.name}
       />
 
-      <ContentBlockEditor
-        isOpen={showAddBlockModal}
-        onClose={() => setShowAddBlockModal(false)}
-        onSave={handleSaveBlock}
-      />
-
+      {/* ✅ UPDATED: Pass image fields to edit modal */}
       <ContentBlockEditor
         isOpen={showEditBlockModal}
         onClose={handleCloseEditBlock}
@@ -276,6 +305,8 @@ const handleCloseEditBlock = () => {
           type: editingBlock.type,
           content: editingBlock.content,
           duration: editingBlock.duration,
+          image: editingBlock.image,
+          imageLink: editingBlock.imageLink,
         } : undefined}
       />
     </>

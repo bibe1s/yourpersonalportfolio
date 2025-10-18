@@ -1,3 +1,5 @@
+// components/contexts/ProfileContext.tsx
+
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
@@ -334,6 +336,9 @@ const addContentBlock = (
           ...block,
           id: generateId('block'),
           order: currentBlocks.length,
+          // Include image fields if provided
+          image: block.image,
+          imageLink: block.imageLink,
         };
         
         console.log('✅ Adding new block:', newBlock);

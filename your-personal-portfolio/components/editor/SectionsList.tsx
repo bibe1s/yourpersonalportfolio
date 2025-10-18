@@ -1,3 +1,5 @@
+// components/editor/SectionsList.tsx
+
 "use client";
 
 import { useProfile } from '@/contexts/ProfileContext';
@@ -34,13 +36,21 @@ export function SectionsList() {
     setShowAddTechModal(true);
   };
 
-  const handleSaveBlock = (type: ContentBlockType, content: string, duration?: string) => {
+  const handleSaveBlock = (
+    type: ContentBlockType, 
+    content: string, 
+    duration?: string,
+    image?: string,
+    imageLink?: string
+  ) => {
     if (!selectedSectionId) return;
 
     addContentBlock(currentMode, selectedSectionId, {
       type,
       content,
       duration,
+      image,
+      imageLink,
     });
   };
 
@@ -106,6 +116,24 @@ export function SectionsList() {
                                 <p className="text-xs text-gray-500 mt-1">
                                   📅 {block.duration}
                                 </p>
+                              )}
+                              
+                              {/* NEW: Show image preview if exists */}
+                              {block.image && (
+                                <div className="mt-2">
+                                  <div className="w-full aspect-video bg-gray-200 rounded overflow-hidden">
+                                    <img
+                                      src={block.image}
+                                      alt="Block preview"
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                  {block.imageLink && (
+                                    <p className="text-xs text-blue-600 mt-1">
+                                      🔗 Link: {block.imageLink}
+                                    </p>
+                                  )}
+                                </div>
                               )}
                             </div>
                             <button

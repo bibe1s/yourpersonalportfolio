@@ -1,3 +1,5 @@
+//component/lib/socialPlatforms.ts
+
 import { SocialPlatform } from './types';
 
 // ============================================

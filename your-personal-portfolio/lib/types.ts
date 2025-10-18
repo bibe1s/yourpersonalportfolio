@@ -1,3 +1,5 @@
+//component/lib/types.ts
+
 // Basic types for content blocks, profile modes, and social platforms
 export type ContentBlockType = 'title' | 'context';
 export type ProfileMode = 'web2' | 'web3';
@@ -38,12 +40,23 @@ export type SocialPlatform =
   | 'dribbble' 
   | 'medium';
 
+// Interface for individual images in a gallery
+export interface GalleryImage {
+  id: string;                    // Unique ID for the image
+  url: string;                   // Image URL or Base64 string
+  link?: string;                 // Optional clickable link
+  isBase64?: boolean;            // Flag to identify Base64 images
+}
+
+
 // Interface for individual content blocks (e.g., titles, descriptions)
 export interface ContentBlock {
   id: string;                    // Unique ID for the block
   type: ContentBlockType;        // Type of content: 'title' or 'context'
   content: string;               // Text content of the block
   duration?: string;             // Optional duration (e.g., "2023 - 2024")
+  image?: string;                // Optional image URL (landscape orientation recommended)
+  imageLink?: string;            // Optional link when image is clicked
   order: number;                 // Sorting order
 }
 
