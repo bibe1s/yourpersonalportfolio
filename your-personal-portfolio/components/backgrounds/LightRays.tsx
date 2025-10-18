@@ -64,8 +64,8 @@ const LightRays: React.FC<LightRaysProps> = ({
   raysOrigin = 'top-center',
   raysColor = DEFAULT_COLOR,
   raysSpeed = 1,
-  lightSpread = 1,
-  rayLength = 2,
+  lightSpread = 4,
+  rayLength = 6,
   pulsating = false,
   fadeDistance = 1.0,
   saturation = 1.0,
@@ -425,7 +425,7 @@ void main() {
   return (
     <div
       ref={containerRef}
-      className={`w-full h-full pointer-events-none z-[3] overflow-hidden relative ${className}`.trim()}
+      className={`w-full h-full pointer-events-none z-[3] overflow-hidden relative bg-black ${className}`.trim()}
     />
   );
 };

@@ -9,8 +9,8 @@ interface OrbProps {
 }
 
 export default function Orb({
-  hue = 0,
-  hoverIntensity = 1,
+  hue = 245,
+  hoverIntensity = 2,
   rotateOnHover = true,
   forceHoverState = false
 }: OrbProps) {
@@ -277,5 +277,5 @@ export default function Orb({
     };
   }, [hue, hoverIntensity, rotateOnHover, forceHoverState]);
 
-  return <div ref={ctnDom} className="w-full h-full" />;
+  return <div ref={ctnDom} className="w-full h-full bg-black" />;
 }

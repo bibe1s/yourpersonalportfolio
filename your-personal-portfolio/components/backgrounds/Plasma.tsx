@@ -197,7 +197,7 @@ export const Plasma: React.FC<PlasmaProps> = ({
     };
   }, [color, speed, direction, scale, opacity, mouseInteractive]);
 
-  return <div ref={containerRef} className="w-full h-full relative overflow-hidden" />;
+  return <div ref={containerRef} className="w-full h-full relative overflow-hidden bg-black" />;
 };
 
 export default Plasma;
