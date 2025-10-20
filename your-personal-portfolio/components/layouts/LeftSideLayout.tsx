@@ -28,7 +28,7 @@ export function LeftSideLayout({ profile, currentMode }: LeftSideLayoutProps) {
       </div>
 
       {/* Right Panel - Content (WITH BACKGROUND THEME) */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative min-h-screen">
         <BackgroundWrapper config={currentBackground}>
           <div className="min-h-screen overflow-y-auto">
             <div className="max-w-4xl mx-auto py-8 lg:py-12 px-4 lg:px-8">

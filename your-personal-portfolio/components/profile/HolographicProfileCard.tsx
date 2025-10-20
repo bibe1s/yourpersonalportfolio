@@ -11,6 +11,8 @@ interface PersonalInfo {
   email: string;
   phone: string;
   image?: string;
+  showEmail?: boolean;  // NEW
+  showPhone?: boolean;  // NEW
 }
 
 interface HolographicProfileCardProps {
@@ -22,6 +24,7 @@ interface HolographicProfileCardProps {
   };
 }
 
+// ... (keep all the utility functions: clamp, round, adjust, easeInOutCubic, hexToRgba)
 const clamp = (value: number, min = 0, max = 100): number =>
   Math.min(Math.max(value, min), max);
 
@@ -40,6 +43,15 @@ const adjust = (
 const easeInOutCubic = (x: number): number =>
   x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 
+function hexToRgba(hex: string, alpha: number): string {
+  const cleanHex = hex.replace('#', '');
+  const r = parseInt(cleanHex.length === 3 ? cleanHex[0] + cleanHex[0] : cleanHex.slice(0, 2), 16);
+  const g = parseInt(cleanHex.length === 3 ? cleanHex[1] + cleanHex[1] : cleanHex.slice(2, 4), 16);
+  const b = parseInt(cleanHex.length === 3 ? cleanHex[2] + cleanHex[2] : cleanHex.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+// ... (keep the GlareHover component - I'll skip it here for brevity but it stays the same)
 const GlareHover: React.FC<{
   width?: string;
   height?: string;
@@ -149,15 +161,8 @@ const GlareHover: React.FC<{
   );
 };
 
-function hexToRgba(hex: string, alpha: number): string {
-  const cleanHex = hex.replace('#', '');
-  const r = parseInt(cleanHex.length === 3 ? cleanHex[0] + cleanHex[0] : cleanHex.slice(0, 2), 16);
-  const g = parseInt(cleanHex.length === 3 ? cleanHex[1] + cleanHex[1] : cleanHex.slice(2, 4), 16);
-  const b = parseInt(cleanHex.length === 3 ? cleanHex[2] + cleanHex[2] : cleanHex.slice(4, 6), 16);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
-
 export function HolographicProfileCard({ personal }: HolographicProfileCardProps) {
+  // ... (keep all the refs and state - same as before)
   const wrapRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const electricStrokeRef = useRef<HTMLDivElement>(null);
@@ -178,9 +183,13 @@ export function HolographicProfileCard({ personal }: HolographicProfileCardProps
   ];
   
   const filterId = useMemo(() => `electric-filter-${Math.random().toString(36).substr(2, 9)}`, []);
-
   const [pixelsReady, setPixelsReady] = useState(false);
 
+  // NEW: Get visibility settings (default to true if not set)
+  const showEmail = personal.showEmail !== false;
+  const showPhone = personal.showPhone !== false;
+
+  // ... (keep all the handlers and effects - handlePointerMove, handlePointerLeave, useEffects, etc.)
   const handlePointerMove = useCallback(
     (event: PointerEvent) => {
       if (!enable3D || !wrapRef.current || !cardRef.current) return;
@@ -216,7 +225,6 @@ export function HolographicProfileCard({ personal }: HolographicProfileCardProps
         wrap.style.setProperty(property, value);
       });
 
-      // Apply transform to blur effect if it exists
       if (borderStyle === 'blur' && blurRef.current) {
         blurRef.current.style.transform = `translate3d(0, 0, 0.1px) rotateX(${properties["--rotate-y"]}) rotateY(${properties["--rotate-x"]})`;
       }
@@ -269,7 +277,6 @@ export function HolographicProfileCard({ personal }: HolographicProfileCardProps
           wrap.style.setProperty(property, value);
         });
 
-        // Animate blur effect back to center
         if (borderStyle === 'blur' && blurRef.current) {
           blurRef.current.style.transform = `translate3d(0, 0, 0.1px) rotateX(${properties["--rotate-y"]}) rotateY(${properties["--rotate-x"]})`;
         }
@@ -277,7 +284,6 @@ export function HolographicProfileCard({ personal }: HolographicProfileCardProps
         if (progress < 1) {
           requestAnimationFrame(animationLoop);
         } else if (blurRef.current && borderStyle === 'blur') {
-          // Reset to neutral position
           blurRef.current.style.transform = 'translate3d(0, 0, 0.1px) rotateX(0deg) rotateY(0deg)';
         }
       };
@@ -435,17 +441,14 @@ export function HolographicProfileCard({ personal }: HolographicProfileCardProps
   const renderBlurEffect = () => {
     if (borderStyle !== 'blur' || !enableGradient) return null;
     
-    // ADJUST THIS VALUE to make the aura bigger or smaller
-    // Negative values make it extend OUTSIDE the card
-    // Current: -60px means it extends 60px beyond the card edges
-    const auraExtend = '-20px'; // Change this to '-80px', '-100px', etc. for bigger aura
+    const auraExtend = '-20px';
     
     return (
       <div 
         ref={blurRef}
         className="absolute pointer-events-none"
         style={{ 
-          inset: auraExtend, // This controls how far the aura extends
+          inset: auraExtend,
           zIndex: 0,
           transform: 'translate3d(0, 0, 0.1px)',
           transition: enable3D ? 'none' : 'transform 1s ease',
@@ -776,25 +779,32 @@ export function HolographicProfileCard({ personal }: HolographicProfileCardProps
           {personal.title}
         </p>
         <h1 className="text-3xl font-bold">{personal.name}</h1>
+        
+        {/* Contact Info - Only show if visibility is enabled */}
         <div className="space-y-2 pt-2">
-          <div className="flex items-center justify-center gap-2 text-gray-300">
-            <Mail className="w-4 h-4 flex-shrink-0" />
-            <a
-              href={`mailto:${personal.email}`}
-              className="hover:text-white transition-colors text-sm"
-            >
-              {personal.email}
-            </a>
-          </div>
-          <div className="flex items-center justify-center gap-2 text-gray-300">
-            <Phone className="w-4 h-4 flex-shrink-0" />
-            <a
-              href={`tel:${personal.phone}`}
-              className="hover:text-white transition-colors text-sm"
-            >
-              {personal.phone}
-            </a>
-          </div>
+          {showEmail && (
+            <div className="flex items-center justify-center gap-2 text-gray-300">
+              <Mail className="w-4 h-4 flex-shrink-0" />
+              <a
+                href={`mailto:${personal.email}`}
+                className="hover:text-white transition-colors text-sm"
+              >
+                {personal.email}
+              </a>
+            </div>
+          )}
+          
+          {showPhone && (
+            <div className="flex items-center justify-center gap-2 text-gray-300">
+              <Phone className="w-4 h-4 flex-shrink-0" />
+              <a
+                href={`tel:${personal.phone}`}
+                className="hover:text-white transition-colors text-sm"
+              >
+                {personal.phone}
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -83,9 +83,20 @@ export function PersonalInfoEditor() {
 
       {/* Email */}
       <div>
-        <label className="block text-sm font-medium mb-2">
-          Email Address *
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-sm font-medium">
+            Email Address *
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={personal.showEmail !== false} // Default to true
+              onChange={(e) => updatePersonalInfo(currentMode, { showEmail: e.target.checked })}
+              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-xs text-gray-600">Show on profile</span>
+          </label>
+        </div>
         <input
           type="email"
           value={personal.email}
@@ -93,13 +104,29 @@ export function PersonalInfoEditor() {
           placeholder="your@example.com"
           className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+        {personal.showEmail === false && (
+          <p className="text-xs text-amber-600 mt-1">
+            ⚠️ Email will be hidden from your profile
+          </p>
+        )}
       </div>
 
       {/* Phone */}
       <div>
-        <label className="block text-sm font-medium mb-2">
-          Contact Number {currentMode === 'web3' && '(Optional)'}
-        </label>
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-sm font-medium">
+            Contact Number {currentMode === 'web3' && '(Optional)'}
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={personal.showPhone !== false} // Default to true
+              onChange={(e) => updatePersonalInfo(currentMode, { showPhone: e.target.checked })}
+              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <span className="text-xs text-gray-600">Show on profile</span>
+          </label>
+        </div>
         <input
           type="tel"
           value={personal.phone}
@@ -107,6 +134,11 @@ export function PersonalInfoEditor() {
           placeholder="+63 XXX-XXX-XXXX"
           className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+        {personal.showPhone === false && (
+          <p className="text-xs text-amber-600 mt-1">
+            ⚠️ Phone number will be hidden from your profile
+          </p>
+        )}
       </div>
 
       {/* Visual Effects */}

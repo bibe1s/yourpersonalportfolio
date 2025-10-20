@@ -22,14 +22,14 @@ import Orb from '@/components/backgrounds/Orb';
 import LetterGlitch from '@/components/backgrounds/LetterGlitch';
 import LiquidChrome from '@/components/backgrounds/LiquidChrome';
 import Balatro from '@/components/backgrounds/Balatro';
-import './BackgroundWrapper.css'; // Import new CSS file
+import './BackgroundWrapper.css';
 
 interface BackgroundWrapperProps {
   config: BackgroundConfig;
   children: React.ReactNode;
+  scoped?: boolean;
 }
 
-// Map background types to components
 const backgroundComponents: Record<string, React.ComponentType<any>> = {
   'liquid-ether': LiquidEther,
   'prism': Prism,
@@ -51,15 +51,18 @@ const backgroundComponents: Record<string, React.ComponentType<any>> = {
   'balatro': Balatro,
 };
 
-export function BackgroundWrapper({ config, children }: BackgroundWrapperProps) {
-  // Get the background component based on type
+export function BackgroundWrapper({ config, children, scoped = false }: BackgroundWrapperProps) {
   const BackgroundComponent = config.type ? backgroundComponents[config.type] : null;
 
+  // Different positioning and sizing for scoped vs full-screen
+  const backgroundPositionClass = scoped ? 'absolute' : 'fixed';
+  const wrapperClass = scoped ? 'relative w-full' : 'relative w-full min-h-screen';
+
   return (
-    <div className="relative w-full min-h-screen">
-      {/* Background Layer - Fixed position */}
+    <div className={wrapperClass}>
+      {/* Background Layer */}
       {config.type !== 'none' && (
-        <div className="fixed inset-0 z-0">
+        <div className={`${backgroundPositionClass} inset-0 z-0`}>
           {config.type === 'particles' && (
             <ParticlesBackground
               color={config.color || '#'}
@@ -69,14 +72,13 @@ export function BackgroundWrapper({ config, children }: BackgroundWrapperProps) 
             />
           )}
           
-          {/* Render ReactBits background if selected */}
           {BackgroundComponent && config.type !== 'particles' && (
             <BackgroundComponent />
           )}
         </div>
       )}
 
-      {/* Content Layer - Scrollable, with pointer-events disabled */}
+      {/* Content Layer */}
       <div className="relative z-10 pointer-events-none">
         <div className="content-wrapper">{children}</div>
       </div>

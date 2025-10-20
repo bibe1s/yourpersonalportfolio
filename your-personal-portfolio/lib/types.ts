@@ -91,7 +91,8 @@ export interface PersonalInfo {
   enable3D?: boolean;            // Toggle for 3D tilt effect
   enableGradient?: boolean;      // Toggle for animated gradient border
   borderStyle?: 'none' | 'gradient' | 'star' | 'electric' | 'pixel' | 'blur'; // Border style
-  // enableGlassEffect?: boolean;   // Toggle for glassmorphism effect for text
+  showEmail?: boolean;           // NEW: Toggle email visibility (default: true)
+  showPhone?: boolean;           // NEW: Toggle phone visibility (default: true)
 }
 
 // Interface for background configuration, supporting color customization

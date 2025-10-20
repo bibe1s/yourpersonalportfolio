@@ -22,13 +22,13 @@ export function RightSideLayout({ profile, currentMode }: RightSideLayoutProps) 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen">
       {/* Mobile Profile Header - Only visible on mobile */}
-      <div className="lg:hidden w-full bg-black flex-col justify-center lg:order-2 lg:sticky lg:top-0 lg:h-screen z-10">
+      <div className="lg:hidden w-full bg-black flex flex-col justify-center z-10">
         <HolographicProfileCard personal={currentData.personal} />
         <SocialLinks links={currentData.socialLinks} />
       </div>
 
       {/* Content Panel - Shows second on mobile, left on desktop (WITH BACKGROUND THEME) */}
-      <div className="flex-1 relative lg:order-1">
+      <div className="flex-1 relative min-h-screen lg:order-1">
         <BackgroundWrapper config={currentBackground}>
           <div className="min-h-screen overflow-y-auto">
             <div className="max-w-4xl mx-auto py-8 lg:py-12 px-4 lg:px-8">
