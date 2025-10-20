@@ -6,12 +6,20 @@ import { ContentBlock as ContentBlockType } from '@/lib/types';
 
 interface ContentBlockProps {
   block: ContentBlockType;
+  sectionGlassEffect?: boolean; // Renamed for clarity
 }
 
-export function ContentBlock({ block }: ContentBlockProps) {
+export function ContentBlock({ block, sectionGlassEffect = false }: ContentBlockProps) {
+  // ✅ FIXED: Use block's own enableGlassEffect if defined, otherwise use section's
+  const shouldApplyGlass = block.enableGlassEffect ?? sectionGlassEffect;
+  
+  const glassClasses = shouldApplyGlass 
+    ? 'backdrop-blur-md bg-black/50 p-4 rounded-lg' 
+    : '';
+
   if (block.type === 'title') {
     return (
-      <div className="mb-4">
+      <div className={`mb-4 ${glassClasses}`}>
         <h2 className="text-2xl font-bold text-white mb-2">
           {block.content}
           {block.duration && (
@@ -52,7 +60,7 @@ export function ContentBlock({ block }: ContentBlockProps) {
 
   // type === 'context'
   return (
-    <div className="text-gray-300 mb-3">
+    <div className={`text-gray-300 mb-3 ${glassClasses}`}>
       <p className="text-lg">
         {block.content}
         {block.duration && (

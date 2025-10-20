@@ -7,7 +7,6 @@ import { Upload } from 'lucide-react';
 export function PersonalInfoEditor() {
   const { profile, currentMode, updatePersonalInfo } = useProfile();
   
-  // Get personal info for current mode
   const personal = profile[currentMode].personal;
 
   return (
@@ -110,7 +109,7 @@ export function PersonalInfoEditor() {
         />
       </div>
 
-      {/* 3D Effect Toggles */}
+      {/* Visual Effects */}
       <div className="border-t pt-4 space-y-3">
         <p className="text-sm font-medium text-gray-700">Visual Effects</p>
         
@@ -138,17 +137,14 @@ export function PersonalInfoEditor() {
           </span>
         </label>
 
-        {/* NEW: Border Style Selector (only shows when gradient is enabled) */}
-          {personal.enableGradient && (
-            <BorderStyleSelector
-              value={personal.borderStyle || 'gradient'}
-              onChange={(style) => updatePersonalInfo(currentMode, { borderStyle: style })}
-            />
-          )}
+        {/* Border Style Selector */}
+        {personal.enableGradient && (
+          <BorderStyleSelector
+            value={personal.borderStyle || 'gradient'}
+            onChange={(style) => updatePersonalInfo(currentMode, { borderStyle: style })}
+          />
+        )}
 
-        <p className="text-xs text-gray-500 mt-2">
-          💡 Enable 3D effect for interactive hover animations. Gradient adds an animated rainbow border.
-        </p>
       </div>
     </div>
   );

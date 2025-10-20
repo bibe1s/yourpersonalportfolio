@@ -26,7 +26,7 @@ export const defaultProfile: Profile = {
       phone: '+63 XXX-XXX-XXXX',
       image: '',
       imageIs3D: true,
-      borderStyle: 'gradient'
+      borderStyle: 'gradient',
     },
     
     // Social Links for Web2

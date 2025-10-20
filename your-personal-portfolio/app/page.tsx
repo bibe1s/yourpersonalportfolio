@@ -1,3 +1,5 @@
+// app/page.tsx
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -23,7 +25,20 @@ export default function PreviewPage() {
         try {
           const parsed = JSON.parse(saved);
           setProfile(parsed);
-          setCurrentMode(parsed.displaySettings.defaultView || 'web2');
+
+          // Auto-switch mode if current mode is disabled
+          const { showWeb2, showWeb3, defaultView } = parsed.displaySettings;
+          let modeToUse = defaultView || 'web2';
+
+          // If default view is disabled, use the enabled one
+          if (modeToUse === 'web2' && !showWeb2 && showWeb3) {
+            modeToUse = 'web3';
+          } else if (modeToUse === 'web3' && !showWeb3 && showWeb2) {
+            modeToUse = 'web2';
+          }
+
+          setCurrentMode(modeToUse);
+
         } catch (error) {
           console.error('Failed to load profile:', error);
         }
@@ -106,9 +121,14 @@ export default function PreviewPage() {
                         <TechStackSection
                           title={section.name}
                           items={section.techStack}
+                          enableGlassEffect={section.enableGlassEffect} 
                         />
                       ) : section.type === 'content' && section.contentBlocks ? (
-                        <div>
+                        <div className={
+                            section.enableGlassEffect 
+                              ? 'backdrop-blur-md bg-black/50 p-6 rounded-lg' 
+                              : ''
+                          }>
                           <h2 className="text-2xl font-bold text-white mb-4">
                             {section.name}
                           </h2>
@@ -116,7 +136,11 @@ export default function PreviewPage() {
                             {section.contentBlocks
                               .sort((a, b) => a.order - b.order)
                               .map((block) => (
-                                <ContentBlock key={block.id} block={block} />
+                                <ContentBlock 
+                                  key={block.id} 
+                                  block={block} 
+                                  sectionGlassEffect={section.enableGlassEffect}
+                                />
                               ))}
                           </div>
                         </div>

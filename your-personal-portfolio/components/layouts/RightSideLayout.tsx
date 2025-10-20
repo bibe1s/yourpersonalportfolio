@@ -1,4 +1,4 @@
-// components/layouts/RightSideLayout.tsx
+// app/components/layouts/RightSideLayout.tsx
 
 "use client";
 
@@ -43,9 +43,14 @@ export function RightSideLayout({ profile, currentMode }: RightSideLayoutProps) 
                         <TechStackSection
                           title={section.name}
                           items={section.techStack}
+                          enableGlassEffect={section.enableGlassEffect}
                         />
                       ) : section.type === 'content' && section.contentBlocks ? (
-                        <div className="mb-8">
+                        <div className={`mb-8 ${
+                          section.enableGlassEffect 
+                            ? 'backdrop-blur-md bg-black/50 p-6 rounded-lg' 
+                            : ''
+                        }`}>
                           <h2 className="text-xl lg:text-2xl font-bold text-white mb-4">
                             {section.name}
                           </h2>
@@ -53,7 +58,11 @@ export function RightSideLayout({ profile, currentMode }: RightSideLayoutProps) 
                             {section.contentBlocks
                               .sort((a, b) => a.order - b.order)
                               .map((block) => (
-                                <ContentBlock key={block.id} block={block} />
+                                <ContentBlock 
+                                  key={block.id} 
+                                  block={block} 
+                                  sectionGlassEffect={section.enableGlassEffect}
+                                />
                               ))}
                           </div>
                         </div>

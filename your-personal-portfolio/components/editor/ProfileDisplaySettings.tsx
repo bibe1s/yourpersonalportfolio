@@ -1,9 +1,11 @@
+// app/components/editor/ProfileDisplaySettings.tsx
+
 "use client";
 
 import { useProfile } from '@/contexts/ProfileContext';
 
 export function ProfileDisplaySettings() {
-  const { profile, updateDisplaySettings } = useProfile();
+  const { profile, updateDisplaySettings, currentMode, setCurrentMode } = useProfile();
   const { showWeb2, showWeb3, defaultView } = profile.displaySettings;
 
   return (
@@ -13,12 +15,20 @@ export function ProfileDisplaySettings() {
       <div className="space-y-3">
         {/* Show Web2 */}
         <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-          <input
-            type="checkbox"
-            checked={showWeb2}
-            onChange={(e) => updateDisplaySettings({ showWeb2: e.target.checked })}
-            className="w-4 h-4"
-          />
+            <input
+              type="checkbox"
+              checked={showWeb2}
+              onChange={(e) => {
+                const newShowWeb2 = e.target.checked;
+                updateDisplaySettings({ showWeb2: newShowWeb2 });
+                
+                // If unchecking Web2 and currently on Web2, switch to Web3
+                if (!newShowWeb2 && currentMode === 'web2' && showWeb3) {
+                  setCurrentMode('web3');
+                }
+              }}
+              className="w-4 h-4"
+            />
           <div>
             <p className="font-medium">Show Web2 Profile</p>
             <p className="text-sm text-gray-500">Traditional tech stack and experience</p>
@@ -30,7 +40,15 @@ export function ProfileDisplaySettings() {
           <input
             type="checkbox"
             checked={showWeb3}
-            onChange={(e) => updateDisplaySettings({ showWeb3: e.target.checked })}
+            onChange={(e) => {
+              const newShowWeb3 = e.target.checked;
+              updateDisplaySettings({ showWeb3: newShowWeb3 });
+              
+              // If unchecking Web3 and currently on Web3, switch to Web2
+              if (!newShowWeb3 && currentMode === 'web3' && showWeb2) {
+                setCurrentMode('web2');
+              }
+            }}
             className="w-4 h-4"
           />
           <div>

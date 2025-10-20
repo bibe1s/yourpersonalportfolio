@@ -1,4 +1,4 @@
-// components/contexts/ProfileContext.tsx
+// app/components/contexts/ProfileContext.tsx
 
 "use client";
 
@@ -97,6 +97,21 @@ export function ProfileProvider({ children }: { children: ReactNode }) {
   
   // Check if there are unsaved changes
   const hasUnsavedChanges = JSON.stringify(profile) !== JSON.stringify(savedProfile);
+
+  // ============================================
+  // AUTO-SWITCH MODE WHEN DISPLAY SETTINGS CHANGE
+  // ============================================
+
+  useEffect(() => {
+    const { showWeb2, showWeb3 } = profile.displaySettings;
+    
+    // If current mode is disabled, switch to the enabled one
+    if (currentMode === 'web2' && !showWeb2 && showWeb3) {
+      setCurrentMode('web3');
+    } else if (currentMode === 'web3' && !showWeb3 && showWeb2) {
+      setCurrentMode('web2');
+    }
+  }, [profile.displaySettings.showWeb2, profile.displaySettings.showWeb3, currentMode]);
   
   // ============================================
   // LOAD FROM LOCALSTORAGE ON MOUNT

@@ -1,3 +1,5 @@
+// app/components/editor/ModeToggle.tsx
+
 "use client";
 
 import { useProfile } from '@/contexts/ProfileContext';

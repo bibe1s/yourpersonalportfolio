@@ -1,4 +1,4 @@
-//component/lib/types.ts
+// app/component/lib/types.ts
 
 // Basic types for content blocks, profile modes, and social platforms
 export type ContentBlockType = 'title' | 'context';
@@ -60,6 +60,7 @@ export interface ContentBlock {
   image?: string;                // Optional image URL (landscape orientation recommended)
   imageLink?: string;            // Optional link when image is clicked
   order: number;                 // Sorting order
+  enableGlassEffect?: boolean;   // Glass effect for this block
 }
 
 // Interface for tech stack items (e.g., React, TypeScript)
@@ -67,6 +68,7 @@ export interface TechStackItem {
   id: string;                    // Unique ID for the tech item
   name: string;                  // Name of the tech (e.g., "React")
   icon: string;                  // URL to the tech's icon
+  link?: string;                 // Optional link when tech icon is clicked
   order: number;                 // Sorting order
 }
 
@@ -89,6 +91,7 @@ export interface PersonalInfo {
   enable3D?: boolean;            // Toggle for 3D tilt effect
   enableGradient?: boolean;      // Toggle for animated gradient border
   borderStyle?: 'none' | 'gradient' | 'star' | 'electric' | 'pixel' | 'blur'; // Border style
+  // enableGlassEffect?: boolean;   // Toggle for glassmorphism effect for text
 }
 
 // Interface for background configuration, supporting color customization
@@ -112,6 +115,7 @@ export interface ProfileSection {
   contentBlocks?: ContentBlock[]; // Content blocks for 'content' type
   techStack?: TechStackItem[];   // Tech stack items for 'techStack' type
   order: number;                 // Sorting order
+  enableGlassEffect?: boolean;   // Glass effect for the section
 }
 
 // Interface for display settings (Web2/Web3 toggles)

@@ -3,12 +3,13 @@
 "use client";
 
 import { useProfile } from '@/contexts/ProfileContext';
-import { Plus, Trash2, X, GripVertical, Edit, Image as ImageIcon } from 'lucide-react';
+import { Plus, Trash2, X, GripVertical, Edit, Image as ImageIcon, Droplets } from 'lucide-react';
 import { useState } from 'react';
 import { ContentBlockEditor } from '@/components/modals/ContentBlockEditor';
 import { TechStackEditor } from '@/components/modals/TechStackEditor';
 import { SectionEditor } from '@/components/modals/SectionEditor';
 import { AddSectionModal } from '@/components/modals/AddSectionModal';
+import { TechStackItemEditor } from '@/components/editor/TechStackItemEditor';
 import { ContentBlockType } from '@/lib/types';
 import {
   DndContext,
@@ -48,6 +49,7 @@ function DraggableSection({ section, mode }: any) {
     deleteTechStack,
     deleteSection,
     updateSection,
+    updateTechStack,
   } = useProfile();
 
   const [showAddBlockModal, setShowAddBlockModal] = useState(false);
@@ -55,6 +57,8 @@ function DraggableSection({ section, mode }: any) {
   const [showEditSectionModal, setShowEditSectionModal] = useState(false);
   const [editingBlock, setEditingBlock] = useState<any>(null);
   const [showEditBlockModal, setShowEditBlockModal] = useState(false);
+  const [editingTech, setEditingTech] = useState<any>(null);
+  const [showEditTechModal, setShowEditTechModal] = useState(false);
 
   const handleSaveSectionName = (name: string) => {
     updateSection(mode, section.id, { name });
@@ -95,6 +99,40 @@ function DraggableSection({ section, mode }: any) {
     }
   };
 
+  const handleEditTech = (tech: any) => {
+    setEditingTech(tech);
+    setShowEditTechModal(true);
+  };
+
+  const handleDeleteTech = () => {
+    if (editingTech) {
+      deleteTechStack(mode, section.id, editingTech.id);
+      setEditingTech(null);
+      setShowEditTechModal(false);
+    }
+  };
+
+  const handleCloseEditTech = () => {
+    setEditingTech(null);const handleEditTech = (tech: any) => {
+  setEditingTech(tech);
+  setShowEditTechModal(true);
+};
+
+const handleDeleteTech = () => {
+  if (editingTech) {
+    deleteTechStack(mode, section.id, editingTech.id);
+    setEditingTech(null);
+    setShowEditTechModal(false);
+  }
+};
+
+const handleCloseEditTech = () => {
+  setEditingTech(null);
+  setShowEditTechModal(false);
+};
+    setShowEditTechModal(false);
+  };
+
   const handleEditBlock = (block: any) => {
     setEditingBlock(block);
     setShowEditBlockModal(true);
@@ -113,9 +151,19 @@ function DraggableSection({ section, mode }: any) {
     setShowEditBlockModal(false);
   };
 
-  const handleSaveTech = (name: string, iconUrl: string) => {
-    addTechStack(mode, section.id, { name, icon: iconUrl });
-  };
+const handleSaveTech = (name: string, iconUrl: string, link?: string) => {
+  if (editingTech) {
+    // Update existing tech item
+    updateTechStack(mode, section.id, editingTech.id, {
+      name,
+      icon: iconUrl,
+      link,
+    });
+  } else {
+    // Add new tech item
+    addTechStack(mode, section.id, { name, icon: iconUrl, link });
+  }
+};
 
   return (
     <>
@@ -140,20 +188,40 @@ function DraggableSection({ section, mode }: any) {
           <h3 className="font-semibold text-lg flex-1">{section.name}</h3>
 
           {/* Actions */}
-          <button
-            onClick={() => setShowEditSectionModal(true)}
-            className="p-2 hover:bg-gray-100 rounded"
-            title="Edit section"
-          >
-            <Edit className="w-4 h-4 text-gray-600" />
-          </button>
-          <button
-            onClick={() => deleteSection(mode, section.id)}
-            className="p-2 text-red-600 hover:bg-red-50 rounded"
-            title="Delete section"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+            <div className="flex items-center gap-1">
+              {/* Glass Effect Toggle */}
+              <button
+                onClick={() => updateSection(mode, section.id, { 
+                  enableGlassEffect: !section.enableGlassEffect 
+                })}
+                className={`p-2 rounded transition-colors ${
+                  section.enableGlassEffect 
+                    ? 'bg-blue-100 text-blue-600 hover:bg-blue-200' 
+                    : 'hover:bg-gray-100 text-gray-600'
+                }`}
+                title={section.enableGlassEffect ? 'Disable glass effect' : 'Enable glass effect'}
+              >
+                <Droplets className="w-4 h-4" />
+              </button>
+              
+              {/* Edit Section Name */}
+              <button
+                onClick={() => setShowEditSectionModal(true)}
+                className="p-2 hover:bg-gray-100 rounded"
+                title="Edit section"
+              >
+                <Edit className="w-4 h-4 text-gray-600" />
+              </button>
+              
+              {/* Delete Section */}
+              <button
+                onClick={() => deleteSection(mode, section.id)}
+                className="p-2 text-red-600 hover:bg-red-50 rounded"
+                title="Delete section"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
         </div>
 
         {/* Section Type Badge */}
@@ -190,6 +258,14 @@ function DraggableSection({ section, mode }: any) {
                               Photo
                             </span>
                           )}
+                          {/* ✅ NEW: Glass effect indicator */}
+                          {block.enableGlassEffect && (
+                            <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <Droplets className="w-3 h-3" />
+                              Glass
+                            </span>
+                          )}
+
                         </div>
                         <p className="text-sm mt-1">{block.content}</p>
                         {block.duration && (
@@ -204,6 +280,26 @@ function DraggableSection({ section, mode }: any) {
                           </p>
                         )}
                       </div>
+
+        <div className="flex items-center gap-1">
+          {/* ✅ NEW: Glass effect toggle for block */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              updateContentBlock(mode, section.id, block.id, {
+                enableGlassEffect: !block.enableGlassEffect
+              });
+            }}
+            className={`p-1 rounded transition-colors ${
+              block.enableGlassEffect 
+                ? 'bg-purple-100 text-purple-600 hover:bg-purple-200' 
+                : 'hover:bg-gray-100 text-gray-400'
+            }`}
+            title={block.enableGlassEffect ? 'Disable glass effect' : 'Enable glass effect'}
+          >
+            <Droplets className="w-3 h-3" />
+          </button>
+
                       <button
                         onClick={(e) => {
                           e.stopPropagation(); // Prevent opening edit modal
@@ -216,6 +312,7 @@ function DraggableSection({ section, mode }: any) {
                       </button>
                     </div>
                   </div>
+                </div>
                 ))
             )}
 
@@ -230,38 +327,56 @@ function DraggableSection({ section, mode }: any) {
           </div>
         )}
 
-        {/* Tech Stack */}
-        {section.type === 'techStack' && section.techStack && (
-          <div className="mt-4 space-y-3">
-            {section.techStack.length === 0 ? (
-              <p className="text-sm text-gray-500">No items yet</p>
-            ) : (
-              <div className="flex flex-wrap gap-3">
-                {section.techStack
-                  .sort((a: any, b: any) => a.order - b.order)
-                  .map((tech: any) => (
-                    <div key={tech.id} className="relative group cursor-pointer">
-                      <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border-2 border-gray-200 hover:border-blue-300 transition-colors">
-                        <img
-                          src={tech.icon}
-                          alt={tech.name}
-                          className="w-10 h-10 object-contain"
-                        />
-                      </div>
-                      <p className="text-xs text-center mt-1 text-gray-600">
-                        {tech.name}
-                      </p>
-                      <button
-                        onClick={() => deleteTechStack(mode, section.id, tech.id)}
-                        className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                        title="Delete"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ))}
+{/* Tech Stack */}
+{section.type === 'techStack' && section.techStack && (
+  <div className="mt-4 space-y-3">
+    {section.techStack.length === 0 ? (
+      <p className="text-sm text-gray-500">No items yet</p>
+    ) : (
+      <div className="flex flex-wrap gap-3">
+        {section.techStack
+          .sort((a: any, b: any) => a.order - b.order)
+          .map((tech: any) => (
+            <div key={tech.id} className="relative group">
+              {/* Clickable tech icon - opens edit modal */}
+              <div
+                onClick={() => handleEditTech(tech)}
+                className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden border-2 border-gray-200 hover:border-blue-300 transition-colors cursor-pointer"
+              >
+                <img
+                  src={tech.icon}
+                  alt={tech.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
-            )}
+              
+              {/* Name and link indicator */}
+              <div className="text-center mt-1 w-16">
+                <p className="text-xs text-gray-600 truncate" title={tech.name}>
+                  {tech.name}
+                </p>
+                {tech.link && (
+                  <p className="text-xs text-blue-600">🔗</p>
+                )}
+              </div>
+              
+              {/* Delete button - stops propagation to prevent edit modal */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (confirm('Are you sure you want to delete this item?')) {
+                    deleteTechStack(mode, section.id, tech.id);
+                  }
+                }}
+                className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10"
+                title="Delete"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          ))}
+      </div>
+    )}
 
             {/* Add Tech Button */}
             <button
@@ -307,6 +422,19 @@ function DraggableSection({ section, mode }: any) {
           duration: editingBlock.duration,
           image: editingBlock.image,
           imageLink: editingBlock.imageLink,
+        } : undefined}
+      />
+
+            {/* Edit Tech Modal */}
+      <TechStackItemEditor
+        isOpen={showEditTechModal}
+        onClose={handleCloseEditTech}
+        onSave={handleSaveTech}
+        onDelete={handleDeleteTech}
+        initialData={editingTech ? {
+          name: editingTech.name,
+          icon: editingTech.icon,
+          link: editingTech.link,
         } : undefined}
       />
     </>

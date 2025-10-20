@@ -1,3 +1,5 @@
+// app/components/modals/SectionEditor.tsx
+
 "use client";
 
 import { useState } from 'react';

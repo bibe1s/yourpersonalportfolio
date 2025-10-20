@@ -1,3 +1,5 @@
+//app/components/modals/ContentBlockEditor.tsx
+
 "use client";
 
 import { useState, useEffect } from 'react';
